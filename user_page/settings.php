@@ -97,22 +97,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Settings</title>
     <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
         <h1>Settings</h1>
         <nav>
             <ul>
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="profile.php">Profile</a></li>
-                <li><a href="settings.php">Settings</a></li>
-                <li><a href="logout.php">Logout</a></li>
+                <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </header>
 
     <section class="settings-section">
-        <h2>Account Settings</h2>
+        <h2><i class="fas fa-cogs"></i> Account Settings</h2>
 
         <!-- Profile Picture Section -->
         <div class="profile-pic-container">
@@ -127,27 +128,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Settings Form -->
         <form id="settings-form" action="settings.php" method="post">
-            <label for="username">Username:</label>
+            <label for="username"><i class="fas fa-user-tag"></i> Username:</label>
             <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($current_username); ?>"><br>
-            <label for="current_email">Current Email:</label>
+            <label for="current_email"><i class="fas fa-envelope"></i> Current Email:</label>
             <input type="text" id="current_email" name="current_email" value="<?php echo htmlspecialchars($current_email); ?>" readonly><br>
-            <label for="email">New Email:</label>
+            <label for="email"><i class="fas fa-envelope-open-text"></i> New Email:</label>
             <input type="email" id="email" name="email"><br>
-            <label for="current_password">Current Password:</label>
+            <label for="current_password"><i class="fas fa-key"></i> Current Password:</label>
             <input type="password" id="current_password" name="current_password"><br>
-            <label for="password">New Password:</label>
+            <label for="password"><i class="fas fa-lock"></i> New Password:</label>
             <input type="password" id="password" name="password"><br>
             <div id="password-strength" class="password-strength"></div>
-            <label for="two_factor">Enable Two-Factor Authentication:</label>
+            <label for="two_factor"><i class="fas fa-shield-alt"></i> Enable Two-Factor Authentication:</label>
             <input type="checkbox" id="two_factor" name="two_factor" <?php echo $two_factor_enabled ? 'checked' : ''; ?>><br>
             <input type="submit" value="Update Settings">
         </form>
 
         <!-- Notification Preferences -->
         <div class="notification-preferences">
-            <h3>Notification Preferences</h3>
+            <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
             <form action="update_notifications.php" method="post">
-                <label for="email_notifications">Receive Email Notifications:</label>
+                <label for="email_notifications"><i class="fas fa-envelope"></i> Receive Email Notifications:</label>
                 <input type="checkbox" id="email_notifications" name="email_notifications" checked><br>
                 <input type="submit" value="Save Preferences">
             </form>
@@ -155,10 +156,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Delete Account -->
         <div class="delete-account">
-            <h3>Delete Account</h3>
+            <h3><i class="fas fa-trash"></i> Delete Account</h3>
             <form action="settings.php" method="post" onsubmit="return confirmDeletion();">
                 <input type="hidden" name="delete_account" value="1">
-                <button type="submit">Delete My Account</button>
+                <button type="submit"><i class="fas fa-trash-alt"></i> Delete My Account</button>
             </form>
         </div>
     </section>
