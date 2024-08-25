@@ -1,0 +1,230 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f6f9fc, #d9e2ec);
+    color: #333;
+}
+
+header {
+    background: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.profile-section {
+    text-align: center;
+    padding: 50px 20px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+}
+
+button {
+    padding: 10px 20px;
+    color: white;
+    background: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #45a049;
+}
+
+.edit-profile-section {
+    padding: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    color: white;
+    background: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background: #45a049;
+}
+
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f6f9fc, #d9e2ec);
+    color: #333;
+}
+
+header {
+    background: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.profile-section, .dashboard-section, .settings-section {
+    text-align: center;
+    padding: 50px 20px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+}
+
+button, input[type="submit"] {
+    padding: 10px 20px;
+    color: white;
+    background: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background: #45a049;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+
+.dashboard-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.dashboard-welcome {
+    flex: 1 1 100%;
+    text-align: center;
+}
+
+.dashboard-stats, .recent-activities, .notifications, .quick-links, .charts {
+    flex: 1 1 45%;
+    margin: 10px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.dashboard-stats h3, .recent-activities h3, .notifications h3, .quick-links h3, .charts h3 {
+    margin-bottom: 15px;
+}
+
+.recent-activities ul, .notifications ul, .quick-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recent-activities li, .notifications li, .quick-links li {
+    margin-bottom: 10px;
+}
+
+.recent-activities li a, .notifications li a, .quick-links li a {
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.recent-activities li a:hover, .notifications li a:hover, .quick-links li a:hover {
+    text-decoration: underline;
+}
+
+.charts canvas {
+    width: 100%;
+    height: auto;
+}
