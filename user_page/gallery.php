@@ -1,12 +1,12 @@
 <?php
 session_start();
-include 'db_connect.php'; // Ensure db_connect.php is correctly set up
+include 'db_connect.php'; // Ensure this file is correctly configured
 
 // Database connection setup with PDO
 $host = 'localhost';
 $db = 'user_page';
-$user = 'your_username';  // Update with your actual username
-$pass = 'your_password';  // Update with your actual password
+$user = 'your_username'; // Update with your actual username
+$pass = 'your_password'; // Update with your actual password
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
@@ -26,16 +26,15 @@ $error_message = '';
 
 // Handle photo upload
 if (isset($_POST['upload_photo'])) {
-    if (isset($_FILES['photo']['name'])) {
+    if (isset($_FILES['photo']['name']) && !empty(array_filter($_FILES['photo']['name']))) {
         $file_count = count($_FILES['photo']['name']);
         $target_dir = "uploads/";
+        $thumbnail_dir = "uploads/thumbnails/";
 
         if (!is_dir($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
 
-        // Create thumbnail directory
-        $thumbnail_dir = "uploads/thumbnails/";
         if (!is_dir($thumbnail_dir)) {
             mkdir($thumbnail_dir, 0777, true);
         }
@@ -51,30 +50,35 @@ if (isset($_POST['upload_photo'])) {
             $check = getimagesize($_FILES["photo"]["tmp_name"][$i]);
             if ($check === false) {
                 $uploadOk = 0;
-                $error_message .= "File " . $original_file_name . " is not an image.<br>";
+                $error_message .= "File " . htmlspecialchars($original_file_name) . " is not an image.<br>";
+                continue; // Skip this file
             }
 
             // Check file size (5MB limit)
             if ($_FILES["photo"]["size"][$i] > 5000000) {
                 $uploadOk = 0;
-                $error_message .= "File " . $original_file_name . " is too large.<br>";
+                $error_message .= "File " . htmlspecialchars($original_file_name) . " is too large.<br>";
+                continue; // Skip this file
             }
 
             // Allow only specific file formats
             if (!in_array($imageFileType, ["jpg", "jpeg", "png", "gif"])) {
                 $uploadOk = 0;
-                $error_message .= "Only JPG, JPEG, PNG & GIF files are allowed for " . $original_file_name . ".<br>";
+                $error_message .= "Only JPG, JPEG, PNG & GIF files are allowed for " . htmlspecialchars($original_file_name) . ".<br>";
+                continue; // Skip this file
             }
 
             // Check if the file already exists in the database
-            $query = "SELECT COUNT(*) FROM photos WHERE image_path = :image_path";
+            $query = "SELECT COUNT(*) FROM photos WHERE user_id = :user_id AND image_path = :image_path";
             $stmt = $pdo->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':image_path', $target_file);
             $stmt->execute();
             $count = $stmt->fetchColumn();
             if ($count > 0) {
                 $uploadOk = 0;
-                $error_message .= "File " . $original_file_name . " already exists.<br>";
+                $error_message .= "File " . htmlspecialchars($original_file_name) . " already exists.<br>";
+                continue; // Skip this file
             }
 
             // If everything is ok, try to upload the file
@@ -82,22 +86,24 @@ if (isset($_POST['upload_photo'])) {
                 if (move_uploaded_file($_FILES["photo"]["tmp_name"][$i], $target_file)) {
                     // Create a thumbnail
                     $thumbnail_path = $thumbnail_dir . $unique_file_name;
-                    createThumbnail($target_file, $thumbnail_path, 300, 300); // Adjust thumbnail size as needed
+                    createThumbnail($target_file, $thumbnail_path, 300, 300);
 
                     // Insert photo information into the database using PDO
                     $query = "INSERT INTO photos (user_id, image_path, thumbnail_path) VALUES (:user_id, :image_path, :thumbnail_path)";
                     $stmt = $pdo->prepare($query);
-                    
                     $stmt->bindParam(':user_id', $user_id);
                     $stmt->bindParam(':image_path', $target_file);
                     $stmt->bindParam(':thumbnail_path', $thumbnail_path);
-                    
                     $stmt->execute();
                 } else {
-                    $error_message .= "Sorry, there was an error uploading your file " . $original_file_name . ".<br>";
+                    $error_message .= "Sorry, there was an error uploading your file " . htmlspecialchars($original_file_name) . ".<br>";
                 }
             }
         }
+
+        // Redirect to the same page to avoid re-upload on refresh
+        header("Location: gallery.php");
+        exit();
     } else {
         $error_message = "No files were uploaded.";
     }
@@ -189,6 +195,8 @@ function createThumbnail($source, $destination, $width, $height) {
         case IMAGETYPE_GIF:
             $image = imagecreatefromgif($source);
             break;
+        default:
+            return false; // Unsupported image type
     }
 
     if ($image !== null) {
@@ -206,17 +214,143 @@ function createThumbnail($source, $destination, $width, $height) {
         }
         imagedestroy($image);
         imagedestroy($image_p);
+        return true;
     }
+    return false;
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
-    <link rel="stylesheet" href="gallery.css"> <!-- Link to the external CSS file -->
+    <title>Your Gallery</title>
+    <link rel="stylesheet" href="gallery.css">
+    <style>
+        /* Add your styles here */
+        .gallery {
+            padding: 20px;
+        }
+
+        .upload-form {
+            margin-bottom: 20px;
+        }
+
+        .upload-form input[type="file"] {
+            display: none;
+        }
+
+        .upload-form button {
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .select-all-container {
+            margin-bottom: 20px;
+        }
+
+        .select-all-container input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .delete-multiple-button {
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-multiple-button:hover {
+            background-color: #c62828;
+        }
+
+        /* Grid layout for the gallery */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .photo-gallery .photo-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-gallery .photo-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.2s ease;
+        }
+
+        .photo-gallery .photo-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-gallery .photo-item .photo-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -50px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal:hover .prev, .modal:hover .next {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -251,21 +385,29 @@ function createThumbnail($source, $destination, $width, $height) {
         </div>
 
         <!-- Photo Gallery Grid -->
-        <div class="gallery-grid">
+        <div class="photo-gallery">
             <?php foreach ($photos as $photo): ?>
-                <div class="gallery-item">
-                    <input type="checkbox" class="photo-checkbox" data-photo-id="<?php echo htmlspecialchars($photo['id']); ?>">
-                    <a href="<?php echo htmlspecialchars($photo['image_path']); ?>" data-lightbox="gallery">
-                        <img src="<?php echo htmlspecialchars($photo['thumbnail_path']); ?>" alt="Photo">
-                    </a>
-                    <a href="gallery.php?delete_photo_id=<?php echo htmlspecialchars($photo['id']); ?>" class="delete-button" onclick="return confirm('Are you sure you want to delete this photo?');">Delete</a>
+                <div class="photo-item">
+                    <img src="<?php echo htmlspecialchars($photo['thumbnail_path']); ?>" alt="Photo" onclick="openModal(<?php echo $photo['id']; ?>)">
+                    <input type="checkbox" class="photo-checkbox" data-photo-id="<?php echo $photo['id']; ?>">
                 </div>
             <?php endforeach; ?>
         </div>
     </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <!-- The Modal -->
+    <div id="photoModal" class="modal">
+        <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
+        <span class="next" onclick="changeSlide(1)">&#10095;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
     <script>
+        let currentSlideIndex = 0;
+        let slides = [];
+        const modal = document.getElementById('photoModal');
+        const modalImage = document.getElementById('modalImage');
+
         document.getElementById('choosePhotoButton').addEventListener('click', function() {
             document.getElementById('photoInput').click();
         });
@@ -289,6 +431,43 @@ function createThumbnail($source, $destination, $width, $height) {
                 alert('No photos selected.');
             }
         });
+
+        function openModal(photoId) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'get_photo.php?id=' + photoId, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    slides = response.photos;
+                    currentSlideIndex = slides.findIndex(photo => photo.id === photoId);
+                    showSlide(currentSlideIndex);
+                    modal.style.display = "block";
+                }
+            };
+            xhr.send();
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        function showSlide(index) {
+            if (slides.length > 0) {
+                modalImage.src = slides[index].image_path;
+                currentSlideIndex = index;
+            }
+        }
+
+        function changeSlide(n) {
+            let newIndex = (currentSlideIndex + n + slides.length) % slides.length;
+            showSlide(newIndex);
+        }
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
     </script>
 </body>
 </html>
