@@ -227,130 +227,10 @@ function createThumbnail($source, $destination, $width, $height) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Gallery</title>
-    <link rel="stylesheet" href="gallery.css">
-    <style>
-        /* Add your styles here */
-        .gallery {
-            padding: 20px;
-        }
+    <link rel="stylesheet" href="g.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        .upload-form {
-            margin-bottom: 20px;
-        }
-
-        .upload-form input[type="file"] {
-            display: none;
-        }
-
-        .upload-form button {
-            margin-top: 10px;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        .select-all-container {
-            margin-bottom: 20px;
-        }
-
-        .select-all-container input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        .delete-multiple-button {
-            padding: 10px 20px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .delete-multiple-button:hover {
-            background-color: #c62828;
-        }
-
-        /* Grid layout for the gallery */
-        .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
-
-        .photo-gallery .photo-item {
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .photo-gallery .photo-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.2s ease;
-        }
-
-        .photo-gallery .photo-item:hover img {
-            transform: scale(1.05);
-        }
-
-        .photo-gallery .photo-item .photo-checkbox {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: white;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-        }
-
-        .prev, .next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -50px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            user-select: none;
-        }
-
-        .next {
-            right: 0;
-            border-radius: 3px 0 0 3px;
-        }
-
-        .prev:hover, .next:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .modal:hover .prev, .modal:hover .next {
-            display: block;
-        }
-    </style>
+   
 </head>
 <body>
     <header>
@@ -468,6 +348,51 @@ function createThumbnail($source, $destination, $width, $height) {
                 closeModal();
             }
         };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.querySelector('.modal');
+    const modalContent = document.querySelector('.modal-content img');
+    const prevBtn = document.querySelector('.prev');
+    const nextBtn = document.querySelector('.next');
+    const closeBtn = document.querySelector('.close');
+    
+    function openModal(src) {
+        modal.style.display = 'block';
+        modalContent.src = src;
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    function showPrevPhoto() {
+        // Implement logic to show the previous photo
+    }
+
+    function showNextPhoto() {
+        // Implement logic to show the next photo
+    }
+
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const src = this.querySelector('img').src;
+            openModal(src);
+        });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    prevBtn.addEventListener('click', showPrevPhoto);
+    nextBtn.addEventListener('click', showNextPhoto);
+
+    // Close the modal when clicking outside the modal content
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+});
+
     </script>
 </body>
 </html>

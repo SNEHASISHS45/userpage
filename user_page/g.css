@@ -1,0 +1,663 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #121212; /* Dark background for the Instagram dark theme */
+    color: #f5f5f5;
+    overflow-y: scroll; /* Ensure scrolling works */
+}
+
+header {
+    background: #1f1f1f;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.nav-container a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.nav-container a:hover {
+    color: #ff4081; /* Instagram-like accent color */
+}
+
+header a {
+    font-size: 1.2rem;
+}
+
+section.gallery {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #e0e0e0;
+}
+
+.error-message {
+    color: #ff4081; /* Instagram-like accent color */
+    margin-top: 1rem;
+}
+
+/* Gallery Grid */
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.gallery-item {
+    position: relative;
+    width: calc(33.333% - 1rem);
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 10px;
+    perspective: 1000px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: rotateY(10deg);
+    filter: brightness(80%);
+}
+
+/* Button Styles */
+.upload-form {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.upload-form input[type="file"] {
+    display: none; /* Hide the file input */
+}
+
+.upload-form button {
+    background: #ff4081; /* Instagram-like accent color */
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.upload-form button:hover {
+    background: #e040fb; /* Lighter accent color */
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon Styles */
+.upload-form button::before {
+    content: '\f093'; /* Font Awesome icon code for upload */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-right: 0.5rem;
+}
+
+.select-all-container {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.select-all-container input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.select-all-container label {
+    font-size: 1rem;
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+.select-all-container .icon {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #ff4081;
+    transition: color 0.3s ease;
+}
+
+.select-all-container .icon:hover {
+    color: #e040fb;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    transition: transform 0.3s ease;
+}
+
+.modal:hover .modal-content {
+    transform: scale(1.05);
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal:hover .prev, .modal:hover .next {
+    display: block;
+}
+
+/* Scrollbar Hidden */
+::-webkit-scrollbar {
+    display: none; /* Hides the scrollbar */
+}
+
+
+
+.gallery {
+    padding: 20px;
+}
+
+.upload-form {
+    margin-bottom: 20px;
+}
+
+.upload-form input[type="file"] {
+    display: none;
+}
+
+.upload-form button {
+    margin-top: 10px;
+}
+
+.error-message {
+    color: red;
+}
+
+.select-all-container {
+    margin-bottom: 20px;
+}
+
+.select-all-container input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.delete-multiple-button {
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-multiple-button:hover {
+    background-color: #c62828;
+}
+
+/* Grid layout for the gallery */
+.photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.photo-gallery .photo-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.photo-gallery .photo-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.photo-gallery .photo-item:hover img {
+    transform: scale(1.05);
+}
+
+.photo-gallery .photo-item .photo-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal:hover .prev, .modal:hover .next {
+    display: block;
+}
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #121212; /* Dark background for the Instagram dark theme */
+    color: #f5f5f5;
+    overflow-y: scroll; /* Ensure scrolling works */
+}
+
+header {
+    background: #1f1f1f;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.nav-container a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-container a:hover {
+    color: #ff4081; /* Instagram-like accent color */
+    transform: scale(1.05);
+}
+
+header a {
+    font-size: 1.2rem;
+}
+
+section.gallery {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1s ease-out;
+}
+
+h1 {
+    text-align: center;
+    color: #e0e0e0;
+}
+
+.error-message {
+    color: #ff4081; /* Instagram-like accent color */
+    margin-top: 1rem;
+}
+
+/* Gallery Grid */
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* 3D Effect and Hover Animation for Gallery Items */
+.gallery-item {
+    position: relative;
+    width: calc(33.333% - 1rem);
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 10px;
+    perspective: 1000px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05) rotateY(10deg);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    animation: hoverPulse 1s infinite;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+    filter: brightness(80%) contrast(1.2);
+}
+
+/* Button Styles */
+.upload-form {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.upload-form input[type="file"] {
+    display: none; /* Hide the file input */
+}
+
+.upload-form button {
+    background: #ff4081; /* Instagram-like accent color */
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.upload-form button:hover {
+    background: #e040fb; /* Lighter accent color */
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon Styles */
+.upload-form button::before {
+    content: '\f093'; /* Font Awesome icon code for upload */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-right: 0.5rem;
+}
+
+.select-all-container {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.select-all-container input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.select-all-container label {
+    font-size: 1rem;
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+.select-all-container .icon {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #ff4081;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.select-all-container .icon:hover {
+    color: #e040fb;
+    transform: scale(1.2);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal:hover .modal-content {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Previous and Next Buttons */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: background 0.3s ease, transform 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    z-index: 10;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* Scrollbar Hidden */
+::-webkit-scrollbar {
+    display: none; /* Hides the scrollbar */
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes hoverPulse {
+    0% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
+}
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Slightly darker overlay */
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Maintain aspect ratio and fit within the frame */
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    transition: background 0.3s ease, transform 0.3s ease;
+    border-radius: 50%;
+    user-select: none;
+    z-index: 10;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.2);
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.close:hover {
+    color: #ff4081; /* Accent color */
+    transform: scale(1.2);
+}
