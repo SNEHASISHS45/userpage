@@ -1,0 +1,96 @@
+/* Base styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #121212; /* Dark background for Instagram theme */
+    color: #e0e0e0; /* Light text color for contrast */
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #333; /* Dark background for header */
+    padding: 10px 20px;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-pic {
+    width: 40px; /* Mini size for profile photo */
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.username {
+    color: #fff;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+}
+
+nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+nav a:hover {
+    background: #555;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.home-section {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.home-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.home-link {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 15px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.home-link:hover {
+    background: #333;
+    color: #fff;
+}
+
+footer {
+    background: #333;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+
