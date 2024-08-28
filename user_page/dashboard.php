@@ -11,10 +11,10 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch user information
 $query = "SELECT username, profile_picture, bio FROM users WHERE id = :id";
-$stmt = $conn->prepare($query);
+$stmt = $pdo->prepare($query);
 
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->errorInfo()[2]);
+    die("Prepare failed: " . $pdo->errorInfo()[2]);
 }
 
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
@@ -32,10 +32,10 @@ $stmt->closeCursor(); // Close the cursor to allow another statement to be execu
 
 // Fetch recent activities
 $recent_activities_query = "SELECT activity, timestamp FROM activities WHERE user_id = :user_id ORDER BY timestamp DESC LIMIT 5";
-$activities_stmt = $conn->prepare($recent_activities_query);
+$activities_stmt = $pdo->prepare($recent_activities_query);
 
 if ($activities_stmt === false) {
-    die("Prepare failed: " . $conn->errorInfo()[2]);
+    die("Prepare failed: " . $pdo->errorInfo()[2]);
 }
 
 $activities_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -43,7 +43,16 @@ $activities_stmt->execute();
 $activities = $activities_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $activities_stmt->closeCursor(); // Close the cursor
-$conn = null; // Close PDO connection
+$pdo = null; // Close PDO connection
+
+// Define the profile picture directory
+$profile_pics_dir = 'profile_pics/';
+$profile_picture_path = $profile_pics_dir . $profile_picture;
+
+// Set default image if profile picture is not available
+if (!file_exists($profile_picture_path)) {
+    $profile_picture_path = 'profile_pics/default_profile_pic.jpg';
+}
 ?>
 
 <!DOCTYPE html>
@@ -60,18 +69,20 @@ $conn = null; // Close PDO connection
     <header>
         <h1>Dashboard</h1>
         <nav>
-            <ul>
-                <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="settings.php"><i class="fas fa-cogs"></i> Settings</a></li>
-                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </nav>
+    <ul>
+        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</nav>
+
     </header>
 
     <section class="dashboard-section">
         <div class="profile-section">
-            <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic">
+            <img src="<?php echo htmlspecialchars($profile_picture_path); ?>" alt="Profile Picture" class="profile-pic">
             <h2><?php echo htmlspecialchars($username); ?></h2>
             <p><?php echo htmlspecialchars($bio); ?></p>
         </div>

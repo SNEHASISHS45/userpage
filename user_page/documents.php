@@ -159,11 +159,16 @@ $pdo = null; // Close PDO connection
 </head>
 <body>
     <header>
-        <nav>
-            <div class="nav-container">
-                <a href="home.php" class="nav-link">Back to Home</a>
-            </div>
-        </nav>
+    <nav>
+    <ul>
+        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</nav>
+
     </header>
 
     <div class="content">

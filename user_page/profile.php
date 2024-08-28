@@ -9,14 +9,42 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch user profile information
-$query = "SELECT username, profile_picture, bio FROM users WHERE id = :id";
-$stmt = $conn->prepare($query);
+// Handle profile picture upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
+    $file = $_FILES['profile_picture'];
+    $upload_dir = 'profile_pics/';
+    $file_name = basename($file['name']);
+    $upload_file = $upload_dir . $file_name;
 
-if ($stmt === false) {
-    die("Prepare failed: " . $conn->errorInfo()[2]);
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        die("File upload error: " . $file['error']);
+    }
+
+    $check = getimagesize($file['tmp_name']);
+    if ($check === false) {
+        die("File is not an image.");
+    }
+
+    if (move_uploaded_file($file['tmp_name'], $upload_file)) {
+        $query = "UPDATE users SET profile_picture = :profile_picture WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':profile_picture', $file_name, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            header("Location: profile.php");
+            exit();
+        } else {
+            die("Failed to update profile picture in database.");
+        }
+    } else {
+        die("File upload failed.");
+    }
 }
 
+// Fetch user profile information
+$query = "SELECT username, profile_picture, bio FROM users WHERE id = :id";
+$stmt = $pdo->prepare($query);
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user_info = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -29,11 +57,9 @@ if ($user_info) {
     die("User not found.");
 }
 
-$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
-
-$conn = null; // Close PDO connection
+$stmt->closeCursor();
+$pdo = null;
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -48,19 +74,21 @@ $conn = null; // Close PDO connection
     <header>
         <h1>Profile</h1>
         <nav>
-            <ul>
-                <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
-                <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
-                <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </nav>
+    <ul>
+        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</nav>
+
     </header>
 
     <div class="profile-section">
         <div class="profile-pic-container">
             <?php if ($profile_picture): ?>
-                <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic">
+                <img src="profile_pics/<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic">
             <?php else: ?>
                 <img src="default-profile.png" alt="Profile Picture" class="profile-pic">
             <?php endif; ?>
@@ -68,7 +96,7 @@ $conn = null; // Close PDO connection
                 <button id="change-profile-photo-btn"><i class="fa-solid fa-camera"></i> Change Profile Picture</button>
                 <form id="file-upload-form" method="post" enctype="multipart/form-data" style="display: none;">
                     <input type="file" id="file-upload" name="profile_picture" accept="image/*">
-                    <input type="submit" name="change_profile_picture" value="Upload">
+                    <input type="submit" value="Upload">
                 </form>
             </div>
         </div>
@@ -79,7 +107,6 @@ $conn = null; // Close PDO connection
         </div>
     </div>
 
-    <!-- Bio Edit Modal -->
     <div id="edit-bio-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">

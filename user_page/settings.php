@@ -11,10 +11,7 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch user information
 $query = "SELECT email, username, profile_picture, two_factor_enabled, password_hash FROM users WHERE id = :id";
-$stmt = $conn->prepare($query);
-if ($stmt === false) {
-    die("Prepare failed: " . $conn->errorInfo()[2]);
-}
+$stmt = $pdo->prepare($query);
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user_info = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,14 +25,46 @@ if ($user_info) {
 } else {
     die("User not found.");
 }
-$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
+$stmt->closeCursor();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Handle profile picture upload
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == UPLOAD_ERR_OK) {
+        $file_tmp_name = $_FILES['profile_picture']['tmp_name'];
+        $file_name = basename($_FILES['profile_picture']['name']);
+        $upload_dir = 'profile_pics/'; // Ensure this matches other pages
+        $file_path = $upload_dir . $file_name;
+
+        // Validate file type
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        if (in_array($_FILES['profile_picture']['type'], $allowed_types)) {
+            if (move_uploaded_file($file_tmp_name, $file_path)) {
+                // Update profile picture in database
+                $query = "UPDATE users SET profile_picture = :profile_picture WHERE id = :id";
+                $stmt = $pdo->prepare($query);
+                $stmt->bindParam(':profile_picture', $file_name, PDO::PARAM_STR); // Store only the file name
+                $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+
+                if ($stmt->execute()) {
+                    echo "Profile picture updated successfully.";
+                    $current_profile_picture = $file_path; // Update current profile picture path
+                } else {
+                    echo "Error updating profile picture in database: " . $stmt->errorInfo()[2];
+                }
+                $stmt->closeCursor();
+            } else {
+                echo "Error moving uploaded file.";
+            }
+        } else {
+            echo "Invalid file type.";
+        }
+    }
+
     // Update email
     if (!empty($_POST['email']) && $_POST['email'] != $current_email) {
         $new_email = $_POST['email'];
         $query = "UPDATE users SET email = :email WHERE id = :id";
-        $stmt = $conn->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->bindParam(':email', $new_email, PDO::PARAM_STR);
         $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
@@ -55,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_new_password = password_hash($new_password, PASSWORD_BCRYPT);
 
             $query = "UPDATE users SET password_hash = :password_hash WHERE id = :id";
-            $stmt = $conn->prepare($query);
+            $stmt = $pdo->prepare($query);
             $stmt->bindParam(':password_hash', $hashed_new_password, PDO::PARAM_STR);
             $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
@@ -73,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Update two-factor authentication status
     $two_factor_enabled = isset($_POST['two_factor']) ? 1 : 0;
     $query = "UPDATE users SET two_factor_enabled = :two_factor WHERE id = :id";
-    $stmt = $conn->prepare($query);
+    $stmt = $pdo->prepare($query);
     $stmt->bindParam(':two_factor', $two_factor_enabled, PDO::PARAM_INT);
     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
@@ -85,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle account deletion
     if (isset($_POST['delete_account'])) {
         $query = "DELETE FROM users WHERE id = :id";
-        $stmt = $conn->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
@@ -100,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Close the connection
-    $conn = null;
+    $pdo = null;
 }
 ?>
 <!DOCTYPE html>
@@ -115,13 +144,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <header>
         <h1>Settings</h1>
         <nav>
-            <ul>
-                <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </nav>
+    <ul>
+        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</nav>
+
     </header>
 
     <section class="settings-section">
@@ -129,9 +160,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Profile Picture Section -->
         <div class="profile-pic-container">
-            <img id="profile-pic-preview" src="<?php echo htmlspecialchars($current_profile_picture); ?>" alt="Profile Picture" class="profile-pic">
+            <img id="profile-pic-preview" src="<?php echo htmlspecialchars($current_profile_picture ? 'profile_pics/' . $current_profile_picture : 'default-profile.png'); ?>" alt="Profile Picture" class="profile-pic">
             <div class="profile-pic-upload">
-                <form id="profile-pic-form" action="update_profile_picture.php" method="post" enctype="multipart/form-data">
+                <form id="profile-pic-form" action="settings.php" method="post" enctype="multipart/form-data">
                     <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
                     <input type="submit" value="Upload New Picture">
                 </form>

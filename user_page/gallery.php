@@ -228,17 +228,19 @@ function createThumbnail($source, $destination, $width, $height) {
     <title>Your Gallery</title>
     <link rel="stylesheet" href="g.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Add your custom styles here */
-    </style>
+   
 </head>
 <body>
     <header>
-        <nav>
-            <div class="nav-container">
-                <a href="home.php">Back to Home</a>
-            </div>
-        </nav>
+    <nav>
+    <ul>
+        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</nav>
     </header>
 
     <section class="gallery">

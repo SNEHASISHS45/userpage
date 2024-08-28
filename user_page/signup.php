@@ -10,47 +10,35 @@ if (isset($_POST['username'], $_POST['password'], $_POST['email'])) {
     $password = $_POST['password'];
     $email = $_POST['email'];
 
-    // Check if email already exists
-    $check_email_query = "SELECT id FROM users WHERE email = ?";
-    $check_email_stmt = $conn->prepare($check_email_query);
+    try {
+        // Check if email already exists
+        $check_email_query = "SELECT id FROM users WHERE email = :email";
+        $check_email_stmt = $pdo->prepare($check_email_query);
+        $check_email_stmt->bindParam(':email', $email);
+        $check_email_stmt->execute();
 
-    if ($check_email_stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-
-    $check_email_stmt->bind_param("s", $email);
-    $check_email_stmt->execute();
-    $check_email_stmt->store_result();
-
-    if ($check_email_stmt->num_rows > 0) {
-        $error_message = "Error: This email address is already registered.";
-        $check_email_stmt->close();
-        $conn->close();
-    } else {
-        $check_email_stmt->close();
-
-        // Prepare and execute the SQL statement
-        $query = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($query);
-
-        if ($stmt === false) {
-            die("Prepare failed: " . $conn->error);
-        }
-
-        $password_hash = password_hash($password, PASSWORD_BCRYPT);
-
-        $stmt->bind_param("sss", $username, $password_hash, $email);
-        $success = $stmt->execute();
-
-        if ($success) {
-            header("Location: login.php");
-            exit();
+        if ($check_email_stmt->rowCount() > 0) {
+            $error_message = "Error: This email address is already registered.";
         } else {
-            $error_message = "Error: " . $stmt->error;
-        }
+            // Prepare and execute the SQL statement
+            $query = "INSERT INTO users (username, password_hash, email) VALUES (:username, :password_hash, :email)";
+            $stmt = $pdo->prepare($query);
 
-        $stmt->close();
-        $conn->close();
+            $password_hash = password_hash($password, PASSWORD_BCRYPT);
+
+            $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':password_hash', $password_hash);
+            $stmt->bindParam(':email', $email);
+
+            if ($stmt->execute()) {
+                header("Location: login.php");
+                exit();
+            } else {
+                $error_message = "Error: Could not execute the query.";
+            }
+        }
+    } catch (PDOException $e) {
+        $error_message = "Error: " . $e->getMessage();
     }
 }
 ?>
