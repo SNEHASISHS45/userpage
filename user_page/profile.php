@@ -9,83 +9,31 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Handle profile picture change
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profile_picture'])) {
-    $upload_dir = 'uploads/';
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
-    }
-    
-    $file_name = basename($_FILES['profile_picture']['name']);
-    $target_file = $upload_dir . $file_name;
-    $upload_ok = 1;
-    $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-    $check = getimagesize($_FILES['profile_picture']['tmp_name']);
-    if ($check === false) {
-        echo "File is not an image.";
-        $upload_ok = 0;
-    }
-
-    if ($_FILES['profile_picture']['size'] > 5000000) {
-        echo "Sorry, your file is too large.";
-        $upload_ok = 0;
-    }
-
-    if ($file_type != 'jpg' && $file_type != 'jpeg' && $file_type != 'png' && $file_type != 'gif') {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-        $upload_ok = 0;
-    }
-
-    if ($upload_ok == 0) {
-        echo "Sorry, your file was not uploaded.";
-    } else {
-        if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
-            $update_query = "UPDATE users SET profile_picture = ? WHERE id = ?";
-            $update_stmt = $conn->prepare($update_query);
-            if ($update_stmt === false) {
-                die("Prepare failed: " . $conn->error);
-            }
-            $update_stmt->bind_param("si", $target_file, $user_id);
-            $update_stmt->execute();
-            $update_stmt->close();
-            header("Location: profile.php");
-            exit();
-        } else {
-            echo "Sorry, there was an error uploading your file.";
-        }
-    }
-}
-
-// Handle bio update
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_bio'])) {
-    $new_bio = $_POST['bio'];
-    
-    $update_bio_query = "UPDATE users SET bio = ? WHERE id = ?";
-    $update_bio_stmt = $conn->prepare($update_bio_query);
-    if ($update_bio_stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
-    $update_bio_stmt->bind_param("si", $new_bio, $user_id);
-    $update_bio_stmt->execute();
-    $update_bio_stmt->close();
-    header("Location: profile.php");
-    exit();
-}
-
-// Fetch user information
-$query = "SELECT username, profile_picture, bio FROM users WHERE id = ?";
+// Fetch user profile information
+$query = "SELECT username, profile_picture, bio FROM users WHERE id = :id";
 $stmt = $conn->prepare($query);
+
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->error);
+    die("Prepare failed: " . $conn->errorInfo()[2]);
 }
-$stmt->bind_param("i", $user_id);
+
+$stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$stmt->bind_result($username, $profile_picture, $bio);
-$stmt->fetch();
-$stmt->close();
-$conn->close();
+$user_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($user_info) {
+    $username = $user_info['username'];
+    $profile_picture = $user_info['profile_picture'];
+    $bio = $user_info['bio'];
+} else {
+    die("User not found.");
+}
+
+$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
+
+$conn = null; // Close PDO connection
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

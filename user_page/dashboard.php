@@ -10,35 +10,40 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user information
-$query = "SELECT username, profile_picture, bio FROM users WHERE id = ?";
+$query = "SELECT username, profile_picture, bio FROM users WHERE id = :id";
 $stmt = $conn->prepare($query);
+
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->error);
+    die("Prepare failed: " . $conn->errorInfo()[2]);
 }
-$stmt->bind_param("i", $user_id);
+
+$stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$stmt->bind_result($username, $profile_picture, $bio);
-$stmt->fetch();
-$stmt->close();
+$user_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($user_info) {
+    $username = $user_info['username'];
+    $profile_picture = $user_info['profile_picture'];
+    $bio = $user_info['bio'];
+} else {
+    die("User not found.");
+}
+$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
 
 // Fetch recent activities
-$recent_activities_query = "SELECT activity, timestamp FROM activities WHERE user_id = ? ORDER BY timestamp DESC LIMIT 5";
+$recent_activities_query = "SELECT activity, timestamp FROM activities WHERE user_id = :user_id ORDER BY timestamp DESC LIMIT 5";
 $activities_stmt = $conn->prepare($recent_activities_query);
 
 if ($activities_stmt === false) {
-    die("Prepare failed: " . $conn->error);
+    die("Prepare failed: " . $conn->errorInfo()[2]);
 }
 
-$activities_stmt->bind_param("i", $user_id);
+$activities_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $activities_stmt->execute();
-$activities_result = $activities_stmt->get_result();
+$activities = $activities_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$activities = [];
-while ($activity = $activities_result->fetch_assoc()) {
-    $activities[] = $activity;
-}
-$activities_stmt->close();
-$conn->close();
+$activities_stmt->closeCursor(); // Close the cursor
+$conn = null; // Close PDO connection
 ?>
 
 <!DOCTYPE html>

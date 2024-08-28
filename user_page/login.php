@@ -19,20 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'];
 
         // Prepare and execute SQL statement
-        $query = "SELECT id, username, password_hash FROM users WHERE username = ?";
+        $query = "SELECT id, username, password_hash FROM users WHERE username = :username";
         $stmt = $conn->prepare($query);
 
         if ($stmt === false) {
-            die("Prepare failed: " . $conn->error);
+            die("Prepare failed: " . $conn->errorInfo()[2]);
         }
 
-        $stmt->bind_param("s", $username);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->store_result();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
 
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $username, $password_hash);
-            $stmt->fetch();
+        $user = $stmt->fetch();
+        if ($user) {
+            $id = $user['id'];
+            $username = $user['username'];
+            $password_hash = $user['password_hash'];
 
             if (password_verify($password, $password_hash)) {
                 $_SESSION['user_id'] = $id;
@@ -46,13 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error_message = "Invalid username or password.";
         }
 
-        $stmt->close();
+        $stmt->closeCursor();
     } else {
         $error_message = "Username and password are required.";
     }
 }
-
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">

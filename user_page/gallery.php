@@ -220,7 +220,6 @@ function createThumbnail($source, $destination, $width, $height) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,8 +228,9 @@ function createThumbnail($source, $destination, $width, $height) {
     <title>Your Gallery</title>
     <link rel="stylesheet" href="g.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-   
+    <style>
+        /* Add your custom styles here */
+    </style>
 </head>
 <body>
     <header>
@@ -280,6 +280,7 @@ function createThumbnail($source, $destination, $width, $height) {
         <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
         <span class="next" onclick="changeSlide(1)">&#10095;</span>
         <img class="modal-content" id="modalImage">
+        <span class="close" onclick="closeModal()">&times;</span>
     </div>
 
     <script>
@@ -348,51 +349,6 @@ function createThumbnail($source, $destination, $width, $height) {
                 closeModal();
             }
         };
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.querySelector('.modal');
-    const modalContent = document.querySelector('.modal-content img');
-    const prevBtn = document.querySelector('.prev');
-    const nextBtn = document.querySelector('.next');
-    const closeBtn = document.querySelector('.close');
-    
-    function openModal(src) {
-        modal.style.display = 'block';
-        modalContent.src = src;
-    }
-
-    function closeModal() {
-        modal.style.display = 'none';
-    }
-
-    function showPrevPhoto() {
-        // Implement logic to show the previous photo
-    }
-
-    function showNextPhoto() {
-        // Implement logic to show the next photo
-    }
-
-    document.querySelectorAll('.gallery-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const src = this.querySelector('img').src;
-            openModal(src);
-        });
-    });
-
-    closeBtn.addEventListener('click', closeModal);
-    prevBtn.addEventListener('click', showPrevPhoto);
-    nextBtn.addEventListener('click', showNextPhoto);
-
-    // Close the modal when clicking outside the modal content
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-});
-
     </script>
 </body>
 </html>

@@ -10,29 +10,39 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user information
-$query = "SELECT email, username, profile_picture, two_factor_enabled, password_hash FROM users WHERE id = ?";
+$query = "SELECT email, username, profile_picture, two_factor_enabled, password_hash FROM users WHERE id = :id";
 $stmt = $conn->prepare($query);
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->error);
+    die("Prepare failed: " . $conn->errorInfo()[2]);
 }
-$stmt->bind_param("i", $user_id);
+$stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$stmt->bind_result($current_email, $current_username, $current_profile_picture, $two_factor_enabled, $hashed_password);
-$stmt->fetch();
-$stmt->close();
+$user_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($user_info) {
+    $current_email = $user_info['email'];
+    $current_username = $user_info['username'];
+    $current_profile_picture = $user_info['profile_picture'];
+    $two_factor_enabled = $user_info['two_factor_enabled'];
+    $hashed_password = $user_info['password_hash'];
+} else {
+    die("User not found.");
+}
+$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Update email
     if (!empty($_POST['email']) && $_POST['email'] != $current_email) {
         $new_email = $_POST['email'];
-        $query = "UPDATE users SET email = ? WHERE id = ?";
+        $query = "UPDATE users SET email = :email WHERE id = :id";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("si", $new_email, $user_id);
+        $stmt->bindParam(':email', $new_email, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
         if (!$stmt->execute()) {
-            echo "Error updating email: " . $stmt->error;
+            echo "Error updating email: " . $stmt->errorInfo()[2];
         }
-        $stmt->close();
+        $stmt->closeCursor();
     }
 
     // Check if a new password is provided and if current password is correct
@@ -44,16 +54,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($current_password, $hashed_password)) {
             $hashed_new_password = password_hash($new_password, PASSWORD_BCRYPT);
 
-            $query = "UPDATE users SET password_hash = ? WHERE id = ?";
+            $query = "UPDATE users SET password_hash = :password_hash WHERE id = :id";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("si", $hashed_new_password, $user_id);
+            $stmt->bindParam(':password_hash', $hashed_new_password, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
             if ($stmt->execute()) {
                 echo "Password updated successfully.";
             } else {
-                echo "Error updating password: " . $stmt->error;
+                echo "Error updating password: " . $stmt->errorInfo()[2];
             }
-            $stmt->close();
+            $stmt->closeCursor();
         } else {
             echo "Current password is incorrect.";
         }
@@ -61,20 +72,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Update two-factor authentication status
     $two_factor_enabled = isset($_POST['two_factor']) ? 1 : 0;
-    $query = "UPDATE users SET two_factor_enabled = ? WHERE id = ?";
+    $query = "UPDATE users SET two_factor_enabled = :two_factor WHERE id = :id";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $two_factor_enabled, $user_id);
+    $stmt->bindParam(':two_factor', $two_factor_enabled, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
     if (!$stmt->execute()) {
-        echo "Error updating two-factor authentication status: " . $stmt->error;
+        echo "Error updating two-factor authentication status: " . $stmt->errorInfo()[2];
     }
-    $stmt->close();
+    $stmt->closeCursor();
 
     // Handle account deletion
     if (isset($_POST['delete_account'])) {
-        $query = "DELETE FROM users WHERE id = ?";
+        $query = "DELETE FROM users WHERE id = :id";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $user_id);
+        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
             session_unset();
@@ -82,13 +94,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: login.php?message=Account deleted successfully.");
             exit();
         } else {
-            echo "Error deleting account: " . $stmt->error;
+            echo "Error deleting account: " . $stmt->errorInfo()[2];
         }
-        $stmt->close();
+        $stmt->closeCursor();
     }
 
     // Close the connection
-    $conn->close();
+    $conn = null;
 }
 ?>
 <!DOCTYPE html>

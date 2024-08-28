@@ -1,17 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "your_username";  // Replace with your actual username
-$password = "your_password";  // Replace with your actual password
-$dbname = "user_page";        // Replace with your actual database name
+$host = 'localhost';
+$db = 'user_page';
+$user = 'your_actual_username'; // Replace with your actual username
+$pass = 'your_actual_password'; // Replace with your actual password
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
-
-// Enable error reporting
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 ?>

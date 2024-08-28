@@ -12,17 +12,19 @@ $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username']; // Assuming username is stored in session
 
 // Fetch user's profile picture
-$query = "SELECT profile_picture FROM users WHERE id = ?";
+$query = "SELECT profile_picture FROM users WHERE id = :user_id";
 $stmt = $conn->prepare($query);
+
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->error);
+    die("Prepare failed: " . $conn->errorInfo()[2]);
 }
-$stmt->bind_param("i", $user_id);
+
+// Bind parameters
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$stmt->bind_result($profile_picture);
-$stmt->fetch();
-$stmt->close();
-$conn->close();
+$profile_picture = $stmt->fetchColumn(); // Fetch a single column value
+$stmt->closeCursor();
+$conn = null; // Close the PDO connection
 ?>
 
 <!DOCTYPE html>
