@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connect.php';
+include 'db_connect.php'; // Ensure this file creates the $pdo variable
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -9,14 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$username = $_SESSION['username']; // Assuming username is stored in session
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; // Default to 'Guest' if not set
 
 // Fetch user's profile picture
 $query = "SELECT profile_picture FROM users WHERE id = :user_id";
-$stmt = $conn->prepare($query);
+$stmt = $pdo->prepare($query);
 
 if ($stmt === false) {
-    die("Prepare failed: " . $conn->errorInfo()[2]);
+    die("Prepare failed: " . $pdo->errorInfo()[2]);
 }
 
 // Bind parameters
@@ -24,7 +24,7 @@ $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $profile_picture = $stmt->fetchColumn(); // Fetch a single column value
 $stmt->closeCursor();
-$conn = null; // Close the PDO connection
+$pdo = null; // Close the PDO connection
 ?>
 
 <!DOCTYPE html>

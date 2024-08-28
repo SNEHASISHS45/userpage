@@ -1,13 +1,16 @@
 <?php
-$host = 'localhost';
-$db = 'user_page';
-$user = 'your_actual_username'; // Replace with your actual username
-$pass = 'your_actual_password'; // Replace with your actual password
-
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dsn = 'mysql:host=localhost;dbname=user_page;charset=utf8';
+    $username = 'your_username';
+    $password = 'your_password';
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+
+    $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    echo 'Connection failed: ' . $e->getMessage();
+    exit();
 }
 ?>

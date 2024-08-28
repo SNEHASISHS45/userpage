@@ -18,17 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        // Prepare and execute SQL statement
+        // Prepare and execute SQL statement using PDO
         $query = "SELECT id, username, password_hash FROM users WHERE username = :username";
-        $stmt = $conn->prepare($query);
+        $stmt = $pdo->prepare($query);
 
         if ($stmt === false) {
-            die("Prepare failed: " . $conn->errorInfo()[2]);
+            die("Prepare failed: " . $pdo->errorInfo()[2]);
         }
 
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->setFetchMode(PDO::FETCH_ASSOC);
 
         $user = $stmt->fetch();
         if ($user) {
@@ -54,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
