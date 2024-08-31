@@ -10,17 +10,20 @@ body {
 header {
     background: #333; /* Dark background for header */
     padding: 10px 20px;
+    position: relative; /* Ensure proper positioning for the hamburger menu */
 }
 
 .nav-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
 }
 
 .profile-info {
     display: flex;
     align-items: center;
+    margin-right: auto; /* Align profile info to the left on larger screens */
 }
 
 .profile-pic {
@@ -35,15 +38,25 @@ header {
     font-weight: bold;
 }
 
-nav ul {
+/* Navigation Styles */
+nav {
+    position: relative;
+}
+
+.nav-menu {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     gap: 15px;
+    justify-content: center; /* Center navigation links */
 }
 
-nav a {
+.nav-menu li {
+    display: inline;
+}
+
+.nav-menu a {
     color: #e0e0e0;
     text-decoration: none;
     font-weight: bold;
@@ -51,30 +64,181 @@ nav a {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-nav a:hover {
+.nav-menu a:hover {
     background: #555;
     color: #fff;
     border-radius: 5px;
 }
 
-.home-section {
-    text-align: center;
-    padding: 50px 20px;
+/* Hamburger Menu Styles */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    margin-left: auto; /* Align hamburger menu to the right */
 }
 
-.home-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+.nav-toggle .bar {
+    background: #e0e0e0;
+    height: 3px;
+    width: 25px;
+    margin: 3px 0;
+    transition: 0.3s;
 }
 
+/* Responsive Styles */
+
+/* Phones (Portrait and Landscape) */
+@media (max-width: 480px) {
+    .profile-pic {
+        width: 30px;
+        height: 30px;
+    }
+
+    .username {
+        font-size: 14px;
+    }
+
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #333;
+        position: absolute;
+        top: 60px; /* Adjust based on header height */
+        left: 0;
+        border-radius: 5px;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-menu li {
+        display: block;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .home-section {
+        text-align: center;
+        padding: 30px 10px;
+    }
+
+    .home-links {
+        display: flex;
+        flex-direction: column; /* Stack links vertically */
+        gap: 10px;
+        align-items: center; /* Center links */
+    }
+
+    .home-link {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-align: center; /* Center text in the button */
+    }
+}
+
+/* Tablets (Portrait and Landscape) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .profile-pic {
+        width: 35px;
+        height: 35px;
+    }
+
+    .username {
+        font-size: 16px;
+    }
+
+    .nav-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: center; /* Center navigation links */
+    }
+
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-menu a {
+        padding: 8px 15px;
+        font-size: 16px;
+    }
+
+    .home-section {
+        text-align: center;
+        padding: 40px 15px;
+    }
+
+    .home-links {
+        display: flex;
+        flex-direction: row; /* Align links horizontally */
+        justify-content: center; /* Center links */
+        gap: 20px;
+    }
+
+    .home-link {
+        padding: 12px 22px;
+        font-size: 17px;
+        text-align: center; /* Center text in the button */
+    }
+}
+
+/* PCs (Larger screens) */
+@media (min-width: 769px) {
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+    }
+
+    .username {
+        font-size: 18px;
+    }
+
+    .nav-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: center; /* Center navigation links */
+    }
+
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-menu a {
+        padding: 5px 10px;
+        font-size: 18px;
+    }
+
+    .home-section {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .home-links {
+        display: flex;
+        flex-direction: row; /* Align links horizontally */
+        justify-content: center; /* Center links */
+        gap: 20px;
+    }
+
+    .home-link {
+        padding: 15px 25px;
+        font-size: 18px;
+        text-align: center; /* Center text in the button */
+    }
+}
+
+/* Button Styles */
 .home-link {
     background: #1e1e1e;
     color: #e0e0e0;
-    padding: 15px 25px;
     border-radius: 10px;
     text-decoration: none;
-    font-size: 18px;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -83,6 +247,7 @@ nav a:hover {
     color: #fff;
 }
 
+/* Footer Styles */
 footer {
     background: #333;
     color: #e0e0e0;
@@ -92,5 +257,3 @@ footer {
     width: 100%;
     bottom: 0;
 }
-
-

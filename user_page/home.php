@@ -48,7 +48,12 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; // D
                     <img src="<?php echo htmlspecialchars($profile_picture_path); ?>" alt="Profile Picture" class="profile-pic">
                     <span class="username"><?php echo htmlspecialchars($username); ?></span>
                 </div>
-                <ul>
+                <div class="nav-toggle" id="nav-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <ul id="nav-menu" class="nav-menu">
                     <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
                     <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
@@ -67,7 +72,14 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; // D
             <a href="personal_vault.php" class="home-link">Personal Vault</a>
         </div>
     </section>
-    
+
+    <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+        const menu = document.getElementById('nav-menu');
+        menu.classList.toggle('active');
+    });
+    </script>
+
     <footer>
         <p>&copy; 2024 Your Website. All rights reserved.</p>
     </footer>
