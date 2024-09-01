@@ -55,80 +55,97 @@ if (!file_exists($profile_picture_path)) {
 }
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="dashboard.scss">
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
-    <header>
-        <h1>Dashboard</h1>
-        <nav>
-    <ul>
-        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-</nav>
 
+</style>
+<body>
+<header>
+        <nav>
+            <div class="nav-container">
+             
+
+                <!-- Navigation Menu -->
+                <ul id="nav-menu" class="nav-menu">
+                    <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
+                    <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
+                    <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+
+               
+
+                <!-- Hamburger Menu -->
+                <div class="nav-toggle" id="nav-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
     </header>
 
+
     <section class="dashboard-section">
-        <div class="profile-section">
-            <img src="<?php echo htmlspecialchars($profile_picture_path); ?>" alt="Profile Picture" class="profile-pic">
-            <h2><?php echo htmlspecialchars($username); ?></h2>
-            <p><?php echo htmlspecialchars($bio); ?></p>
-        </div>
+        <div class="container">
+            <div class="profile-section">
+                <img src="<?php echo htmlspecialchars($profile_picture_path); ?>" alt="Profile Picture" class="profile-pic">
+                <h2><?php echo htmlspecialchars($username); ?></h2>
+                <p><?php echo htmlspecialchars($bio); ?></p>
+            </div>
 
-        <div class="dashboard-stats">
-            <h3><i class="fas fa-chart-bar"></i> Dashboard Stats</h3>
-            <p>Welcome back, <?php echo htmlspecialchars($username); ?>! Here are your latest statistics:</p>
-            <!-- Add your dashboard stats here -->
-        </div>
+            <div class="dashboard-stats">
+                <h3><i class="fas fa-chart-bar"></i> Dashboard Stats</h3>
+                <p>Welcome back, <?php echo htmlspecialchars($username); ?>! Here are your latest statistics:</p>
+                <!-- Add your dashboard stats here -->
+            </div>
 
-        <div class="recent-activities">
-            <h3><i class="fas fa-calendar-check"></i> Recent Activities</h3>
-            <ul>
-                <?php foreach ($activities as $activity): ?>
-                    <li><?php echo htmlspecialchars($activity['activity']); ?> - <small><?php echo htmlspecialchars($activity['timestamp']); ?></small></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+            <div class="recent-activities">
+                <h3><i class="fas fa-calendar-check"></i> Recent Activities</h3>
+                <ul>
+                    <?php foreach ($activities as $activity): ?>
+                        <li><?php echo htmlspecialchars($activity['activity']); ?> - <small><?php echo htmlspecialchars($activity['timestamp']); ?></small></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
 
-        <div class="notifications">
-            <h3><i class="fas fa-bell"></i> Notifications</h3>
-            <ul>
-                <li><a href="#"><i class="fas fa-comment-dots"></i> New comment on your post</a></li>
-                <li><a href="#"><i class="fas fa-user-plus"></i> You have a new follower</a></li>
-                <li><a href="#"><i class="fas fa-download"></i> System update available</a></li>
-            </ul>
-        </div>
+            <div class="notifications">
+                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-comment-dots"></i> New comment on your post</a></li>
+                    <li><a href="#"><i class="fas fa-user-plus"></i> You have a new follower</a></li>
+                    <li><a href="#"><i class="fas fa-download"></i> System update available</a></li>
+                </ul>
+            </div>
 
-        <div class="quick-links">
-            <h3><i class="fas fa-link"></i> Quick Links</h3>
-            <ul>
-                <li><a href="profile.php"><i class="fas fa-user-circle"></i> View Profile</a></li>
-                <li><a href="settings.php"><i class="fas fa-cogs"></i> Settings</a></li>
-                <li><a href="profile.php"><i class="fas fa-edit"></i> Edit Profile</a></li>
-            </ul>
-        </div>
+            <div class="quick-links">
+                <h3><i class="fas fa-link"></i> Quick Links</h3>
+                <ul>
+                    <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="profile.php"><i class="fas fa-user-circle"></i> View Profile</a></li>
+                    <li><a href="settings.php"><i class="fas fa-cogs"></i> Settings</a></li>
+                    <li><a href="profile.php"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                </ul>
+            </div>
 
-        <div class="charts">
-            <h3><i class="fas fa-chart-line"></i> Data Visualization</h3>
-            <canvas id="userChart" width="400" height="200"></canvas>
+            <div class="charts">
+                <h3><i class="fas fa-chart-line"></i> Data Visualization</h3>
+                <canvas id="userChart" width="400" height="200"></canvas>
+            </div>
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2024 Your Website. All rights reserved.</p>
-    </footer>
+   
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>

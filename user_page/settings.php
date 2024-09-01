@@ -141,18 +141,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>Settings</h1>
+<header>
         <nav>
-    <ul>
-        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-</nav>
+            <h1>Settings</h1>
+            <div class="nav-container">
+                
+                <!-- Navigation Menu -->
+                <ul id="nav-menu" class="nav-menu">
+                    <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
+                    <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
+                    <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
 
+              
+
+                <!-- Hamburger Menu -->
+                <div class="nav-toggle" id="nav-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
     </header>
 
     <section class="settings-section">
@@ -241,6 +253,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         function confirmDeletion() {
             return confirm("Are you sure you want to delete your account? This action cannot be undone.");
         }
+    </script>
+     <script>
+        document.getElementById('nav-toggle').addEventListener('click', function () {
+            const menu = document.getElementById('nav-menu');
+            menu.classList.toggle('active');
+        });
     </script>
 </body>
 </html>

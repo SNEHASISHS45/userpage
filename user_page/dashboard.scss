@@ -1,0 +1,301 @@
+/* dashboard.scss */
+
+@import 'variables'; // Import your common variables like colors, fonts, etc.
+
+/* Global Styles */
+
+body {
+    font-family: 'Inter', sans-serif;
+   background-color: #00B7FF;
+    color: #e0e0e0; /* Light text color for contrast */
+    padding: 20px;
+    margin: 0;
+    animation: fadeInBody 1s ease-out;
+}
+
+/* Hide scrollbars but keep scroll functionality */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+@-moz-document url-prefix() {
+    body {
+        scrollbar-width: none;
+    }
+}
+
+body {
+    -ms-overflow-style: none;
+}
+
+header {
+    padding: 15px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000; /* Above other content */
+    transition: background 0.3s ease;
+    box-shadow: none; /* Remove glow effect */
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between logo/profile and nav menu */
+    background: none; /* No background */
+    border: none; /* No border */
+}
+.nav-container {
+    display: flex;
+    align-items: center;
+    max-width: 1200px; /* Optional: limit width */
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    justify-content: center; /* Center nav menu items */
+}
+
+.nav-menu li {
+    position: relative;
+}
+
+.nav-menu a {
+    color: #fff; /* White text color for better contrast */
+    text-decoration: none;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 20px;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 0 8px rgba(0, 0, 255, 0.6); /* Glow effect */
+}
+
+.nav-menu a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #002aff;
+    transform: scale(1.05);
+    text-shadow: 0 0 12px rgba(0, 0, 255, 0.9); /* Enhanced glow on hover */
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+/* Hamburger Menu Styles */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-left: auto; /* Push to the right end */
+    margin-right: 30px;
+}
+
+.nav-toggle:hover {
+    transform: rotate(180deg); /* Rotate on hover */
+}
+
+.nav-toggle .bar {
+    background: #fff; /* White color for visibility */
+    height: 3px;
+    width: 25px;
+    margin: 3px 0;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.nav-toggle.active .bar:nth-child(1) {
+    transform: rotate(45deg) translateY(7px);
+}
+
+.nav-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translateY(-7px);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9); /* Slightly more opaque for visibility */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+
+    .nav-menu.active {
+        display: flex;
+        max-height: 500px; /* Enough height to show all menu items */
+        opacity: 1;
+    }
+
+    .nav-menu li {
+        display: block;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+}
+
+
+
+.dashboard-section {
+    max-width: 1200px;
+    margin: 80px auto 30px; /* Adjust top margin to account for fixed header */
+    padding: 30px;
+    background-color: #00B7FF; // Glassy effect
+    border-radius: 15px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Rest of the styles remain unchanged */
+
+.dashboard-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+.profile-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-pic {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 5px solid #444;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    transition: transform 0.4s, box-shadow 0.4s;
+}
+
+.profile-pic:hover {
+    transform: scale(1.2) rotate(10deg);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+}
+
+.dashboard-stats, .recent-activities, .notifications, .quick-links, .charts {
+    margin-bottom: 30px;
+    color: #f0f0f0;
+    background: rgba(255, 255, 255, 0.1); // Glassy effect
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.dashboard-stats::before, .recent-activities::before, .notifications::before, .quick-links::before, .charts::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0.2;
+    transform: rotate(-15deg);
+    z-index: 0;
+}
+
+.dashboard-stats > *, .recent-activities > *, .notifications > *, .quick-links > *, .charts > * {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-stats:hover, .recent-activities:hover, .notifications:hover, .quick-links:hover, .charts:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.dashboard-stats h3, .recent-activities h3, .notifications h3, .quick-links h3, .charts h3 {
+    color: #ff4081;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.dashboard-stats p, .recent-activities ul, .notifications ul, .quick-links ul {
+    background: rgba(255, 255, 255, 0.1); /* Glassy transparent effect */
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.dashboard-stats p {
+    margin: 10px 0;
+}
+
+.recent-activities ul, .notifications ul, .quick-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recent-activities li, .notifications li, .quick-links li {
+    margin-bottom: 10px;
+}
+
+.recent-activities li a, .notifications li a, .quick-links li a {
+    color: #f0f0f0;
+    text-decoration: none;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.recent-activities li a:hover, .notifications li a:hover, .quick-links li a:hover {
+    color: #ff4081;
+    transform: translateX(5px);
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1); /* Glassy transparent effect */
+    color: #f0f0f0;
+    border-top: 2px solid #444;
+    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+}
+
