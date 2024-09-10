@@ -219,10 +219,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2024 Your Website. All rights reserved.</p>
-    </footer>
-
     <script>
         document.getElementById('profile_picture').addEventListener('change', function(event) {
             const file = event.target.files[0];

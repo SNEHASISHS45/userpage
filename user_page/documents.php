@@ -11,6 +11,22 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $error_message = '';
 
+// Update activity when loading the documents page
+updateActivity($pdo, $user_id, 'documents');
+
+// Update user activity function
+function updateActivity($pdo, $user_id, $activity_type) {
+    $now = date('Y-m-d H:i:s');
+    $query = "INSERT INTO user_activity (user_id, activity_type, last_opened)
+              VALUES (:user_id, :activity_type, :last_opened)
+              ON DUPLICATE KEY UPDATE last_opened = VALUES(last_opened)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':activity_type', $activity_type, PDO::PARAM_STR);
+    $stmt->bindParam(':last_opened', $now, PDO::PARAM_STR);
+    $stmt->execute();
+}
+
 // Handle document upload
 if (isset($_POST['upload_document'])) {
     if (isset($_FILES['document']) && !empty(array_filter($_FILES['document']['name']))) {
@@ -159,16 +175,15 @@ $pdo = null; // Close PDO connection
 </head>
 <body>
     <header>
-    <nav>
-    <ul>
-        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-</nav>
-
+        <nav>
+            <ul>
+                <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
     </header>
 
     <div class="content">

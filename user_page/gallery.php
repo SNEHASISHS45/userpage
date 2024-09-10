@@ -2,17 +2,39 @@
 session_start();
 include 'db_connect.php'; // Ensure this file is correctly configured
 
-// Database connection setup with PDO
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Database connection variables
 $host = 'localhost';
-$db = 'user_page';
-$user = 'your_username'; // Update with your actual username
-$pass = 'your_password'; // Update with your actual password
+$dbname = 'user_page';
+$username = 'your_username';
+$password = 'your_password';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    error_log("Database connection failed: " . $e->getMessage());
+    die("Could not connect to the database.");
+}
+
+// Update activity when loading the gallery
+updateActivity($pdo, $_SESSION['user_id'], 'gallery');
+
+// Update user activity
+function updateActivity($pdo, $user_id, $activity_type) {
+    $now = date('Y-m-d H:i:s');
+    $query = "INSERT INTO user_activity (user_id, activity_type, last_opened)
+              VALUES (:user_id, :activity_type, :last_opened)
+              ON DUPLICATE KEY UPDATE last_opened = VALUES(last_opened)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':activity_type', $activity_type, PDO::PARAM_STR);
+    $stmt->bindParam(':last_opened', $now, PDO::PARAM_STR);
+    $stmt->execute();
 }
 
 // Check if user is logged in
@@ -100,6 +122,9 @@ if (isset($_POST['upload_photo'])) {
                 }
             }
         }
+
+        // Update activity after file upload
+        updateActivity($pdo, $user_id, 'gallery');
 
         // Redirect to the same page to avoid re-upload on refresh
         header("Location: gallery.php");
@@ -228,7 +253,6 @@ function createThumbnail($source, $destination, $width, $height) {
     <title>Your Gallery</title>
     <link rel="stylesheet" href="g.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   
 </head>
 <body>
     <header>

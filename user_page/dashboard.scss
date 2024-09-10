@@ -1,12 +1,9 @@
-/* dashboard.scss */
-
-@import 'variables'; // Import your common variables like colors, fonts, etc.
-
-/* Global Styles */
-
+/* Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 body {
     font-family: 'Inter', sans-serif;
-   background-color: #00B7FF;
+    background-color: #00B7FF;
     color: #e0e0e0; /* Light text color for contrast */
     padding: 20px;
     margin: 0;
@@ -28,6 +25,7 @@ body {
     -ms-overflow-style: none;
 }
 
+/* Header Styles */
 header {
     padding: 15px 20px;
     position: fixed;
@@ -38,6 +36,7 @@ header {
     box-shadow: none; /* Remove glow effect */
 }
 
+/* Navigation Styles */
 nav {
     display: flex;
     align-items: center;
@@ -45,6 +44,7 @@ nav {
     background: none; /* No background */
     border: none; /* No border */
 }
+
 .nav-container {
     display: flex;
     align-items: center;
@@ -76,37 +76,41 @@ nav {
     padding: 12px 20px;
     border-radius: 20px;
     transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-    position: relative;
-    display: inline-block;
-    text-shadow: 0 0 8px rgba(0, 0, 255, 0.6); /* Glow effect */
 }
 
 .nav-menu a:hover {
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #002aff;
+    background: rgba(255, 255, 255, 0.2); /* Light background on hover */
+    color: #00B7FF; /* Highlight color */
     transform: scale(1.05);
-    text-shadow: 0 0 12px rgba(0, 0, 255, 0.9); /* Enhanced glow on hover */
 }
 
-.nav-menu a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: #007bff;
-    transition: width 0.3s ease, left 0.3s ease;
+/* Profile Info */
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff; /* White text color for consistency */
+    flex: 0 0 auto; /* Don't grow or shrink */
 }
 
-.nav-menu a:hover::after {
-    width: 100%;
-    left: 0;
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover; /* Ensures the image covers the area */
+    border: 2px solid #fff; /* Optional: border for visibility */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* Glow effect */
+}
+
+.profile-pic:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    box-shadow: 0 0 15px rgba(0, 0, 255, 0.7); /* Enhanced glow on hover */
+}
+
+.username {
+    font-weight: bold;
+    font-size: 1em;
 }
 
 /* Hamburger Menu Styles */
@@ -149,16 +153,18 @@ nav {
         display: none;
         flex-direction: column;
         width: 100%;
-        background: rgba(255, 255, 255, 0.9); /* Slightly more opaque for visibility */
+       background: transparent;
         position: absolute;
         top: 60px;
         left: 0;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         transition: max-height 0.3s ease, opacity 0.3s ease;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
+    }
+    h1{
+        display: none;
     }
 
     .nav-menu.active {
@@ -179,123 +185,74 @@ nav {
 }
 
 
-
-.dashboard-section {
-    max-width: 1200px;
-    margin: 80px auto 30px; /* Adjust top margin to account for fixed header */
-    padding: 30px;
-    background-color: #00B7FF; // Glassy effect
-    border-radius: 15px;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
-    position: relative;
-    overflow: hidden;
+.dashboard-section{
+    padding-top: 100px;
 }
 
-/* Rest of the styles remain unchanged */
-
-.dashboard-section .container {
-    position: relative;
-    z-index: 1;
-}
-
-.profile-section {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.profile-pic {
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border: 5px solid #444;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-    transition: transform 0.4s, box-shadow 0.4s;
-}
-
-.profile-pic:hover {
-    transform: scale(1.2) rotate(10deg);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
-}
-
-.dashboard-stats, .recent-activities, .notifications, .quick-links, .charts {
-    margin-bottom: 30px;
-    color: #f0f0f0;
-    background: rgba(255, 255, 255, 0.1); // Glassy effect
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-    position: relative;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.dashboard-stats::before, .recent-activities::before, .notifications::before, .quick-links::before, .charts::before {
-    content: '';
+.user-activity {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent);
-    opacity: 0.2;
-    transform: rotate(-15deg);
-    z-index: 0;
-}
-
-.dashboard-stats > *, .recent-activities > *, .notifications > *, .quick-links > *, .charts > * {
-    position: relative;
-    z-index: 1;
-}
-
-.dashboard-stats:hover, .recent-activities:hover, .notifications:hover, .quick-links:hover, .charts:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
-}
-
-.dashboard-stats h3, .recent-activities h3, .notifications h3, .quick-links h3, .charts h3 {
-    color: #ff4081;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    margin: 0;
-}
-
-.dashboard-stats p, .recent-activities ul, .notifications ul, .quick-links ul {
-    background: rgba(255, 255, 255, 0.1); /* Glassy transparent effect */
-    border-radius: 8px;
-    padding: 10px;
-}
-
-.dashboard-stats p {
-    margin: 10px 0;
-}
-
-.recent-activities ul, .notifications ul, .quick-links ul {
-    list-style: none;
-    padding: 0;
-}
-
-.recent-activities li, .notifications li, .quick-links li {
-    margin-bottom: 10px;
-}
-
-.recent-activities li a, .notifications li a, .quick-links li a {
-    color: #f0f0f0;
-    text-decoration: none;
-    transition: color 0.3s, transform 0.3s;
-}
-
-.recent-activities li a:hover, .notifications li a:hover, .quick-links li a:hover {
-    color: #ff4081;
-    transform: translateX(5px);
-}
-
-footer {
-    text-align: center;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1); /* Glassy transparent effect */
-    color: #f0f0f0;
-    border-top: 2px solid #444;
-    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.7);
+    top: 100px; /* Adjust as needed */
+    left: 100px; /* Adjust as needed */
+    background-color: transparent !important;
     backdrop-filter: blur(10px);
+    
+    padding: 15px;
+    
+    border-radius: 15px; /* Slightly more rounded corners */
+    cursor: auto; /* Default cursor */
+    overflow: hidden; /* Hide overflow to manage scrollbar visibility */
+    min-width: 400px; /* Minimum width for resizing */
+    min-height: 100px; /* Minimum height for resizing */
+    
+    /* Add floating animation */
+    animation: float 6s ease-in-out infinite;
+    
 }
 
+.move {
+    padding: 5px; /* Padding for header area */
+    cursor: move; /* Indicate draggable */
+    font-size: 1em; /* Adjust as needed */
+}
+
+.resize-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.4); /* Transparent resize handle */
+    border-radius: 50%; /* Rounded handle */
+    cursor: se-resize; /* Resizing handle cursor */
+}
+
+.resize-handle.bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+/* Hide scrollbars but keep scroll functionality */
+.user-activity::-webkit-scrollbar {
+    display: none;
+}
+
+@-moz-document url-prefix() {
+    .user-activity {
+        scrollbar-width: none;
+    }
+}
+
+.user-activity {
+    -ms-overflow-style: none;
+}
+
+/* Keyframes for floating animation */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px); /* Float upwards */
+    }
+    100% {
+        transform: translateY(0px); /* Return to original position */
+    }
+}

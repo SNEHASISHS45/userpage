@@ -9,7 +9,20 @@ body {
     margin: 0;
     animation: fadeInBody 1s ease-out;
 }
+/* Hide scrollbars but keep scroll functionality */
+body::-webkit-scrollbar {
+    display: none;
+}
 
+@-moz-document url-prefix() {
+    body {
+        scrollbar-width: none;
+    }
+}
+
+body {
+    -ms-overflow-style: none;
+}
 /* Header Styles */
 header {
     padding: 15px 20px;
@@ -181,14 +194,16 @@ nav {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background: #1c1c1c;
+    background: #00B7FF;
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     animation: fadeInSection 1s ease-out;
+    position: relative;
+    top: 100px;
 }
 
 .settings-section h2 {
-    color: #ff007f; /* Vibrant header color */
+    color: whitesmoke; /* Vibrant header color */
     margin-bottom: 20px;
     text-shadow: 0 0 10px rgba(255, 0, 127, 0.6);
 }
@@ -201,7 +216,7 @@ nav {
 .settings-section label {
     margin-bottom: 8px;
     font-weight: bold;
-    color: #ff007f; /* Vibrant label color */
+    color: whitesmoke; /* Vibrant label color */
     text-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
 }
 
@@ -211,9 +226,9 @@ nav {
 .settings-section input[type="file"] {
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #444;
+    border: 1px solid whitesmoke;
     border-radius: 5px;
-    background: #2c2c2c;
+    background: #00aaff;
     color: #e0e0e0;
     transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
     transform: perspective(500px) rotateX(0deg) rotateY(0deg);
@@ -224,15 +239,15 @@ nav {
 .settings-section input[type="text"]:focus,
 .settings-section input[type="file"]:focus {
     background: #333;
-    border-color: #ff007f;
+    border-color: whitesmoke;
     outline: none;
-    box-shadow: 0 0 8px rgba(255, 0, 127, 0.7); /* Enhanced focus effect */
+    box-shadow: 0 0 8px rgba(0, 85, 255, 0.7); /* Enhanced focus effect */
     transform: perspective(500px) rotateX(2deg) rotateY(2deg);
 }
 
 .settings-section input[type="submit"] {
     padding: 10px 20px;
-    background: #ff007f; /* Vibrant button color */
+    background: whitesmoke; /* Vibrant button color */
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -243,7 +258,7 @@ nav {
 }
 
 .settings-section input[type="submit"]:hover {
-    background: #e6007f; /* Darker shade on hover */
+    background: whitesmoke; /* Darker shade on hover */
     transform: scale(1.05) perspective(500px) rotateX(2deg) rotateY(2deg);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
 }
@@ -268,7 +283,7 @@ nav {
     height: 150px;
     object-fit: cover;
     margin-bottom: 20px;
-    background: #555; /* Fallback color */
+    background: whitesmoke; /* Fallback color */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
     transition: transform 0.5s, box-shadow 0.5s, filter 0.5s;
 }
@@ -301,7 +316,7 @@ nav {
 
 .delete-account button {
     padding: 10px 20px;
-    background: #ff4c4c;
+    background: whitesmoke;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -312,7 +327,7 @@ nav {
 }
 
 .delete-account button:hover {
-    background: #e60000;
+    background: whitesmoke;
     transform: scale(1.05) perspective(500px) rotateX(2deg) rotateY(2deg);
 }
 
@@ -322,11 +337,11 @@ nav {
 }
 
 .password-strength.weak {
-    color: #ff4c4c;
+    color: whitesmoke;
 }
 
 .password-strength.medium {
-    color: #ffb700;
+    color: whitesmoke;
 }
 
 .password-strength.strong {

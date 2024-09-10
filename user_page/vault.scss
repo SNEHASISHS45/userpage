@@ -1,17 +1,13 @@
-/* Base Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 body {
     font-family: 'Inter', sans-serif;
-    color: #333;
+    background-color: #00B7FF;
+    color: #e0e0e0; /* Light text color for contrast */
+    padding: 20px;
     margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Full viewport height */
-    background: #1a1a1a; /* Dark background for better glow effect */
-    overflow: hidden; /* Prevent scrollbars from appearing */
+    animation: fadeInBody 1s ease-out;
 }
 
 /* Header Styles */
@@ -41,22 +37,6 @@ nav {
     margin: 0 auto;
     width: 100%;
     position: relative;
-}
-
-/* Brand Logo */
-.brand-logo {
-    flex: 0 0 auto; /* Don't grow or shrink */
-}
-
-.brand-logo img {
-    height: 40px; /* Adjust logo size */
-    transition: transform 0.3s ease, filter 0.3s ease;
-    box-shadow: none; /* Remove glow effect */
-}
-
-.brand-logo:hover img {
-    transform: rotate(360deg); /* Rotate on hover */
-    filter: brightness(1.2); /* Increase brightness on hover */
 }
 
 /* Navigation Menu */
@@ -114,47 +94,14 @@ nav {
     left: 0;
 }
 
-/* Profile Info */
-.profile-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff; /* White text color for consistency */
-    flex: 0 0 auto; /* Don't grow or shrink */
-}
-
-.profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover; /* Ensures the image covers the area */
-    border: 2px solid #fff; /* Optional: border for visibility */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* Glow effect */
-}
-
-.profile-pic:hover {
-    transform: scale(1.1); /* Slightly enlarge on hover */
-    box-shadow: 0 0 15px rgba(0, 0, 255, 0.7); /* Enhanced glow on hover */
-}
-
-.username {
-    font-weight: bold;
-    font-size: 1em;
-}
-
-/* Hamburger Menu Styles */
 .nav-toggle {
-    display: none;
+    display: none; /* Hidden by default, shown on mobile */
     flex-direction: column;
+    justify-content: space-around;
+    height: 20px;
     cursor: pointer;
-    transition: transform 0.3s ease;
     margin-left: auto; /* Push to the right end */
-    margin-right: 30px;
-}
-
-.nav-toggle:hover {
-    transform: rotate(180deg); /* Rotate on hover */
+    margin-right: 70px;
 }
 
 .nav-toggle .bar {
@@ -165,36 +112,21 @@ nav {
     transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.nav-toggle.active .bar:nth-child(1) {
-    transform: rotate(45deg) translateY(7px);
-}
-
-.nav-toggle.active .bar:nth-child(2) {
-    opacity: 0;
-}
-
-.nav-toggle.active .bar:nth-child(3) {
-    transform: rotate(-45deg) translateY(-7px);
-}
-
 /* Responsive Styles */
 @media (max-width: 768px) {
     .nav-menu {
         display: none;
         flex-direction: column;
         width: 100%;
-       background: transparent;
+        background: transparent;
         position: absolute;
         top: 60px;
         left: 0;
-        border-radius: 5px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
         transition: max-height 0.3s ease, opacity 0.3s ease;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-    }
-    h1{
-        display: none;
     }
 
     .nav-menu.active {
@@ -212,6 +144,35 @@ nav {
     .nav-toggle {
         display: flex;
     }
+}
+
+/* Toggle menu animations */
+@keyframes slideInMenu {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nav-menu.active {
+    animation: slideInMenu 0.3s ease-out;
+}
+
+/* Add toggle menu styles for active state */
+.nav-toggle.active .bar:nth-child(1) {
+    transform: rotate(45deg) translateY(7px);
+}
+
+.nav-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translateY(-7px);
 }
 
 /* Home Section */
@@ -278,11 +239,69 @@ nav {
 
 .home-link span {
     position: relative;
-    z-index: 1; /* Ensure text is above pseudo-element */
+    z-index: 1; /* Ensure text is above the overlay */
 }
 
-/* Keyframes for Animations */
-@keyframes fadeIn {
+/* Upload Form */
+.upload-form {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.upload-form h2 {
+    margin-bottom: 15px;
+}
+
+.upload-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.upload-form input[type="text"],
+.upload-form textarea,
+.upload-form input[type="file"] {
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.upload-form input[type="submit"] {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.upload-form input[type="submit"]:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+}
+
+/* Keyframes for animations */
+@keyframes fadeInBody {
     from {
         opacity: 0;
     }
@@ -293,29 +312,11 @@ nav {
 
 @keyframes fadeInUp {
     from {
-        transform: translateY(20px);
         opacity: 0;
+        transform: translateY(20px);
     }
     to {
-        transform: translateY(0);
         opacity: 1;
-    }
-}
-.personal-vault {
-    padding: 20px;
-    .vault-items {
-        margin-top: 20px;
-        .vault-item {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            h2 {
-                margin-top: 0;
-            }
-            a {
-                color: #007BFF;
-                text-decoration: none;
-            }
-        }
+        transform: translateY(0);
     }
 }

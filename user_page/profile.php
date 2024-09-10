@@ -75,7 +75,6 @@ $pdo = null;
         <nav>
             <h1>Profile</h1>
             <div class="nav-container">
-                
                 <!-- Navigation Menu -->
                 <ul id="nav-menu" class="nav-menu">
                     <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
@@ -84,8 +83,6 @@ $pdo = null;
                     <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
                     <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
-
-              
 
                 <!-- Hamburger Menu -->
                 <div class="nav-toggle" id="nav-toggle">
@@ -100,7 +97,7 @@ $pdo = null;
     <div class="profile-section">
         <div class="profile-pic-container">
             <?php if ($profile_picture): ?>
-                <img src="profile_pics/<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-pic">
+                <img src="profile_pics/<?php echo htmlspecialchars($profile_picture ?? '', ENT_QUOTES, 'UTF-8'); ?>" alt="Profile Picture" class="profile-pic">
             <?php else: ?>
                 <img src="default-profile.png" alt="Profile Picture" class="profile-pic">
             <?php endif; ?>
@@ -114,7 +111,7 @@ $pdo = null;
         </div>
         <div class="bio-section">
             <h3>Bio</h3>
-            <p><?php echo htmlspecialchars($bio); ?></p>
+            <p><?php echo htmlspecialchars($bio ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
             <button id="edit-bio-btn"><i class="fa-solid fa-edit"></i> Edit Bio</button>
         </div>
     </div>
@@ -126,7 +123,7 @@ $pdo = null;
                 <span class="close-btn">&times;</span>
             </div>
             <form method="post">
-                <textarea name="bio" rows="4" placeholder="Write something about yourself..." required><?php echo htmlspecialchars($bio); ?></textarea>
+                <textarea name="bio" rows="4" placeholder="Write something about yourself..." required><?php echo htmlspecialchars($bio ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                 <div class="modal-footer">
                     <button type="submit" name="update_bio" class="confirm"><i class="fa-solid fa-check"></i> Save</button>
                     <button type="button" class="cancel"><i class="fa-solid fa-times"></i> Cancel</button>

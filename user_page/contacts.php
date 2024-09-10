@@ -1,3 +1,48 @@
+<?php
+session_start();
+include 'db_connect.php'; // Ensure this file is correctly configured
+
+// Database connection setup with PDO
+$host = 'localhost';
+$dbname = 'user_page';
+$username = 'your_username'; // Update with your actual username
+$password = 'your_password'; // Update with your actual password
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Update activity when loading the contacts page
+updateActivity($pdo, $user_id, 'contacts');
+
+// Update user activity function
+function updateActivity($pdo, $user_id, $activity_type) {
+    $now = date('Y-m-d H:i:s');
+    $query = "INSERT INTO user_activity (user_id, activity_type, last_opened)
+              VALUES (:user_id, :activity_type, :last_opened)
+              ON DUPLICATE KEY UPDATE last_opened = VALUES(last_opened)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':activity_type', $activity_type, PDO::PARAM_STR);
+    $stmt->bindParam(':last_opened', $now, PDO::PARAM_STR);
+    $stmt->execute();
+}
+
+// Close PDO connection
+$pdo = null;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -2,124 +2,147 @@
 session_start();
 include 'db_connect.php';
 
-// Initialize error_message and logout_message variables
+// Initialize error_message variable
 $error_message = '';
-$logout_message = '';
-
-// Check if the user has been logged out
-if (isset($_GET['message']) && $_GET['message'] == 'logged_out') {
-    $logout_message = 'You have been logged out successfully. Please log in again.';
-}
 
 // Process login form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if form fields are set
-    if (isset($_POST['username'], $_POST['password'])) {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_username'], $_POST['login_password'])) {
+    $username = $_POST['login_username'];
+    $password = $_POST['login_password'];
 
-        // Prepare and execute SQL statement using PDO
-        $query = "SELECT id, username, password_hash FROM users WHERE username = :username";
-        $stmt = $pdo->prepare($query);
+    $query = "SELECT id, username, password_hash FROM users WHERE username = :username";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+    $stmt->execute();
 
-        if ($stmt === false) {
-            die("Prepare failed: " . $pdo->errorInfo()[2]);
-        }
-
-        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $stmt->execute();
-
-        $user = $stmt->fetch();
-        if ($user) {
-            $id = $user['id'];
-            $username = $user['username'];
-            $password_hash = $user['password_hash'];
-
-            if (password_verify($password, $password_hash)) {
-                $_SESSION['user_id'] = $id;
-                $_SESSION['username'] = $username;
-                header("Location: home.php");
-                exit();
-            } else {
-                $error_message = "Invalid username or password.";
-            }
-        } else {
-            $error_message = "Invalid username or password.";
-        }
-
-        $stmt->closeCursor();
+    $user = $stmt->fetch();
+    if ($user && password_verify($password, $user['password_hash'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        header("Location: home.php");
+        exit();
     } else {
-        $error_message = "Username and password are required.";
+        $error_message = "Invalid username or password.";
+    }
+}
+
+// Process signup form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_POST['signup_password'], $_POST['signup_email'])) {
+    $username = $_POST['signup_username'];
+    $password = $_POST['signup_password'];
+    $email = $_POST['signup_email'];
+
+    $check_email_query = "SELECT id FROM users WHERE email = :email";
+    $check_email_stmt = $pdo->prepare($check_email_query);
+    $check_email_stmt->bindParam(':email', $email);
+    $check_email_stmt->execute();
+
+    if ($check_email_stmt->rowCount() > 0) {
+        $error_message = "Error: This email address is already registered.";
+    } else {
+        $query = "INSERT INTO users (username, password_hash, email) VALUES (:username, :password_hash, :email)";
+        $stmt = $pdo->prepare($query);
+        $password_hash = password_hash($password, PASSWORD_BCRYPT);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':password_hash', $password_hash);
+        $stmt->bindParam(':email', $email);
+
+        if ($stmt->execute()) {
+            header("Location: login.php");
+            exit();
+        } else {
+            $error_message = "Error: Could not execute the query.";
+        }
     }
 }
 ?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login & Sign Up</title>
     <link rel="stylesheet" href="login.css">
-    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.21/build/spline-viewer.js" async></script>
 </head>
 <body>
-    <div class="background-animation"></div>
-    <div class="form-container">
-        <h1>Login</h1>
-        <form action="login.php" method="post">
-            <div class="input-container">
-                <i class="fas fa-user icon"></i>
-                <input type="text" id="username" name="username" required placeholder=" ">
-                <label for="username">Username</label>
+    <spline-viewer url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode" 
+                  loading-anim-type="spinner-small-light" 
+                  class="spline-bg">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAwCAYAAADn..." alt="Spline preview"/>
+    </spline-viewer>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-container" id="signup-form">
+                <h1>Sign Up</h1>
+                <form action="login.php" method="post">
+                    <div class="input-container">
+                        <i class="fas fa-user icon"></i>
+                        <input type="text" placeholder="Username" name="signup_username" required>
+                    </div>
+                    <div class="input-container">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" placeholder="Password" name="signup_password" required>
+                    </div>
+                    <div class="input-container">
+                        <i class="fas fa-envelope icon"></i>
+                        <input type="email" placeholder="Email" name="signup_email" required>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                    <div class="form-links">
+                        <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+                    </div>
+                    <?php if ($error_message): ?>
+                        <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
+                    <?php endif; ?>
+                </form>
             </div>
 
-            <div class="input-container">
-                <i class="fas fa-lock icon"></i>
-                <input type="password" id="password" name="password" required placeholder=" ">
-                <label for="password">Password</label>
+            <div class="form-container" id="login-form">
+                <h1>Login</h1>
+                <form action="login.php" method="post">
+                    <div class="input-container">
+                        <i class="fas fa-user icon"></i>
+                        <input type="text" placeholder="Username" name="login_username" required>
+                    </div>
+                    <div class="input-container">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" placeholder="Password" name="login_password" required>
+                    </div>
+                    <button type="submit" value="Sign Up">Login</button>
+                    <div class="form-links">
+                    <p>Don't have an account?<a href="#" onclick="showSignup()">Register</a></p>
+                    </div>
+                    <?php if ($error_message): ?>
+                        <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
+                    <?php endif; ?>
+                </form>
             </div>
-
-            <input type="submit" value="Login">
-
-            <?php if (!empty($error_message)): ?>
-                <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
-            <?php endif; ?>
-
-            <?php if (!empty($logout_message)): ?>
-                <div class="logout-message" id="logout-message"><?php echo htmlspecialchars($logout_message); ?></div>
-            <?php endif; ?>
-        </form>
-        <div class="form-links">
-           <p>Don't have an account yet? <a href="signup.php">Sign Up</a></p>
         </div>
     </div>
 
     <script>
-    window.addEventListener('DOMContentLoaded', (event) => {
-        // Hide the logout message after 5 seconds
-        var logoutMessage = document.getElementById('logout-message');
-        if (logoutMessage) {
-            setTimeout(function() {
-                logoutMessage.style.opacity = 0;
-                setTimeout(function() {
-                    logoutMessage.style.display = 'none';
-                }, 500); 
-            }, 5000); 
-        }
+      function showSignup() {
+    document.getElementById('signup-form').style.transform = 'translateX(0)';
+    document.getElementById('login-form').style.transform = 'translateX(100%)';
+}
 
-        // Hide the error message after 3 seconds
-        var errorMessage = document.querySelector('.error-message');
-        if (errorMessage) {
-            setTimeout(function() {
-                errorMessage.style.opacity = 0;
-                setTimeout(function() {
-                    errorMessage.style.display = 'none';
-                }, 500); 
-            }, 3000); 
-        }
-    });
+function showLogin() {
+    document.getElementById('signup-form').style.transform = 'translateX(-100%)';
+    document.getElementById('login-form').style.transform = 'translateX(0)';
+}
+
+// Initially show the login form
+showLogin();
+
     </script>
 </body>
 </html>
