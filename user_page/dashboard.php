@@ -100,6 +100,35 @@ try {
     echo "Error fetching activity data.";
 }
 
+// Fetch storage data
+function fetchStorageData($pdo, $user_id) {
+    try {
+        $query = "SELECT page, SUM(storage_used) AS total_storage FROM storage WHERE user_id = :user_id GROUP BY page";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $storage_data = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $storage_data[$row['page']] = $row['total_storage'];
+        }
+        $stmt->closeCursor();
+
+        return $storage_data;
+    } catch (PDOException $e) {
+        error_log("Error fetching storage data: " . $e->getMessage());
+        return [];
+    }
+}
+
+// Get storage data
+$storage_data = fetchStorageData($pdo, $user_id);
+
+$total_storage = array_sum($storage_data);
+$max_storage_mb = 1024; // Example max storage (1 GB)
+$total_storage_mb = round($total_storage / (1024 * 1024), 2);
+$storage_remaining_mb = $max_storage_mb - $total_storage_mb;
+
 // Close PDO connection
 $pdo = null;
 
@@ -115,9 +144,6 @@ if (!file_exists($profile_picture_path)) {
 // Debugging code
 error_log("Debugging: Profile picture path is " . $profile_picture_path);
 ?>
-
-
-
 
 
 <!DOCTYPE html>
@@ -194,18 +220,25 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
     <spline-viewer loading-anim-type="spinner-small-light" url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode"></spline-viewer>
 </div>
 
-
 <div class="user-activity floating-window">
     <div class="header">
         <h3 class="move"><i class="fas fa-tachometer-alt"></i> User Activity</h3>
     </div>
     <ul>
-        <li>Gallery: <span class="count"><?php echo $activity_counts['gallery']; ?></span> times - Last opened: <span class="last-opened"><?php echo $activity_last_opened['gallery']; ?></span></li>
-        <li>Contacts: <span class="count"><?php echo $activity_counts['contacts']; ?></span> times - Last opened: <span class="last-opened"><?php echo $activity_last_opened['contacts']; ?></span></li>
-        <li>Personal Vault: <span class="count"><?php echo $activity_counts['vault']; ?></span> times - Last opened: <span class="last-opened"><?php echo $activity_last_opened['vault']; ?></span></li>
-        <li>Documents: <span class="count"><?php echo $activity_counts['documents']; ?></span> times - Last opened: <span class="last-opened"><?php echo $activity_last_opened['documents']; ?></span></li>
+        <li>Gallery: <span class="count"><?php echo isset($activity_counts['gallery']) ? $activity_counts['gallery'] : 0; ?></span> times - Last opened: <span class="last-opened"><?php echo isset($activity_last_opened['gallery']) ? $activity_last_opened['gallery'] : 'Never'; ?></span></li>
+        <li>Contacts: <span class="count"><?php echo isset($activity_counts['contacts']) ? $activity_counts['contacts'] : 0; ?></span> times - Last opened: <span class="last-opened"><?php echo isset($activity_last_opened['contacts']) ? $activity_last_opened['contacts'] : 'Never'; ?></span></li>
+        <li>Personal Vault: <span class="count"><?php echo isset($activity_counts['vault']) ? $activity_counts['vault'] : 0; ?></span> times - Last opened: <span class="last-opened"><?php echo isset($activity_last_opened['vault']) ? $activity_last_opened['vault'] : 'Never'; ?></span></li>
+        <li>Documents: <span class="count"><?php echo isset($activity_counts['documents']) ? $activity_counts['documents'] : 0; ?></span> times - Last opened: <span class="last-opened"><?php echo isset($activity_last_opened['documents']) ? $activity_last_opened['documents'] : 'Never'; ?></span></li>
     </ul>
     <div class="resize-handle bottom-right"></div>
+</div>
+
+<!-- Add storage information -->
+<div class="storage-info">
+    <h3>Storage Details</h3>
+    <p>Total Storage Used: <?php echo number_format($total_storage_mb, 2); ?> MB</p>
+    <p>Maximum Storage Allowed: <?php echo number_format($max_storage_mb, 2); ?> MB</p>
+    <p>Storage Remaining: <?php echo number_format($storage_remaining_mb, 2); ?> MB</p>
 </div>
 
 <script>
@@ -243,7 +276,7 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
             document.removeEventListener('mouseup', stopDrag);
         }
 
-        // Resize functionality (same as before)
+        // Resize functionality
         let isResizing = false;
 
         handle.addEventListener('mousedown', (e) => {
@@ -254,8 +287,10 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
 
         function resize(e) {
             if (isResizing) {
-                userActivity.style.width = `${e.clientX - userActivity.getBoundingClientRect().left}px`;
-                userActivity.style.height = `${e.clientY - userActivity.getBoundingClientRect().top}px`;
+                const newWidth = e.clientX - userActivity.getBoundingClientRect().left;
+                const newHeight = e.clientY - userActivity.getBoundingClientRect().top;
+                userActivity.style.width = `${newWidth}px`;
+                userActivity.style.height = `${newHeight}px`;
             }
         }
 
@@ -266,8 +301,6 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
         }
     });
 </script>
-
-
 
 </body>
 </html>

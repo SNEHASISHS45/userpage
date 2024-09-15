@@ -37,6 +37,16 @@ function updateActivity($pdo, $user_id, $activity_type) {
     $stmt->execute();
 }
 
+function updateStorageUsage($pdo, $user_id, $sizeChange) {
+    $query = "INSERT INTO storage (user_id, storage_used) 
+              VALUES (:user_id, :sizeChange) 
+              ON DUPLICATE KEY UPDATE storage_used = storage_used + :sizeChange";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':sizeChange', $sizeChange, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -117,6 +127,9 @@ if (isset($_POST['upload_photo'])) {
                     $stmt->bindParam(':image_path', $target_file);
                     $stmt->bindParam(':thumbnail_path', $thumbnail_path);
                     $stmt->execute();
+
+                    // Update storage usage for the uploaded photo
+                    updateStorageUsage($pdo, $user_id, $_FILES["photo"]["size"][$i]);
                 } else {
                     $error_message .= "Sorry, there was an error uploading your file " . htmlspecialchars($original_file_name) . ".<br>";
                 }
@@ -159,6 +172,10 @@ if (isset($_GET['delete_photo_id'])) {
         if (file_exists($photo['thumbnail_path'])) {
             unlink($photo['thumbnail_path']);
         }
+
+        // Update storage usage after deletion
+        $storage_used = $_FILES["photo"]["size"][$i] ?? 0; // Ensure valid file size
+        updateStorageUsage($pdo, $user_id, -$storage_used);
     }
 }
 
@@ -190,59 +207,42 @@ if (isset($_GET['photo_ids'])) {
             if (file_exists($photo['thumbnail_path'])) {
                 unlink($photo['thumbnail_path']);
             }
+
+            // Update storage usage after deletion
+            $storage_used = file_exists($photo['image_path']) ? filesize($photo['image_path']) : 0;
+            updateStorageUsage($pdo, $user_id, -$storage_used);
         }
     }
 }
 
-// Fetch user's photos from the database using PDO
-$query = "SELECT id, image_path, thumbnail_path FROM photos WHERE user_id = :user_id";
+// Fetch user photos
+$query = "SELECT * FROM photos WHERE user_id = :user_id";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$pdo = null; // Close PDO connection
-
-// Function to create a high-quality thumbnail
-function createThumbnail($source, $destination, $width, $height) {
-    list($source_width, $source_height, $image_type) = getimagesize($source);
-    
-    $image_p = imagecreatetruecolor($width, $height);
-    $image = null;
-    
-    switch ($image_type) {
+// Display photos
+function createThumbnail($sourcePath, $destinationPath, $thumbWidth, $thumbHeight) {
+    list($width, $height, $type) = getimagesize($sourcePath);
+    $sourceImage = imagecreatefromstring(file_get_contents($sourcePath));
+    $thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
+    imagecopyresampled($thumb, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $width, $height);
+    switch ($type) {
         case IMAGETYPE_JPEG:
-            $image = imagecreatefromjpeg($source);
+            imagejpeg($thumb, $destinationPath);
             break;
         case IMAGETYPE_PNG:
-            $image = imagecreatefrompng($source);
+            imagepng($thumb, $destinationPath);
             break;
         case IMAGETYPE_GIF:
-            $image = imagecreatefromgif($source);
+            imagegif($thumb, $destinationPath);
             break;
-        default:
-            return false; // Unsupported image type
     }
-
-    if ($image !== null) {
-        imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $source_width, $source_height);
-        switch ($image_type) {
-            case IMAGETYPE_JPEG:
-                imagejpeg($image_p, $destination, 100); // Quality parameter
-                break;
-            case IMAGETYPE_PNG:
-                imagepng($image_p, $destination, 0); // Quality parameter
-                break;
-            case IMAGETYPE_GIF:
-                imagegif($image_p, $destination);
-                break;
-        }
-        imagedestroy($image);
-        imagedestroy($image_p);
-        return true;
-    }
-    return false;
+    imagedestroy($sourceImage);
+    imagedestroy($thumb);
 }
+
 ?>
 
 <!DOCTYPE html>
