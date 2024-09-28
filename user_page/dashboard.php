@@ -11,18 +11,42 @@ error_reporting(E_ALL);
 include 'db_connect.php'; // Ensure this path is correct
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    error_log("Debugging: No user_id in session, redirecting to login.");
+if (!isset($_SESSION['username'])) {
+    error_log("Debugging: No username in session, redirecting to login.");
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$username = $_SESSION['username'];
 
 // Ensure $pdo is initialized
 if (!isset($pdo)) {
     error_log("Debugging: PDO is not initialized.");
     die("Database connection not established.");
+}
+
+// Get user_id from username
+function getUserId($pdo, $username) {
+    try {
+        $query = "SELECT id FROM users WHERE username = :username";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return $user ? $user['id'] : null;
+    } catch (PDOException $e) {
+        error_log("Error fetching user ID: " . $e->getMessage());
+        return null;
+    }
+}
+
+$user_id = getUserId($pdo, $username);
+
+if (!$user_id) {
+    error_log("Debugging: User ID not found for username $username.");
+    echo "User ID not found.";
+    exit();
 }
 
 // Update user activity
@@ -100,38 +124,6 @@ try {
     echo "Error fetching activity data.";
 }
 
-// Fetch storage data
-function fetchStorageData($pdo, $user_id) {
-    try {
-        $query = "SELECT page, SUM(storage_used) AS total_storage FROM storage WHERE user_id = :user_id GROUP BY page";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $storage_data = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $storage_data[$row['page']] = $row['total_storage'];
-        }
-        $stmt->closeCursor();
-
-        return $storage_data;
-    } catch (PDOException $e) {
-        error_log("Error fetching storage data: " . $e->getMessage());
-        return [];
-    }
-}
-
-// Get storage data
-$storage_data = fetchStorageData($pdo, $user_id);
-
-$total_storage = array_sum($storage_data);
-$max_storage_mb = 1024; // Example max storage (1 GB)
-$total_storage_mb = round($total_storage / (1024 * 1024), 2);
-$storage_remaining_mb = $max_storage_mb - $total_storage_mb;
-
-// Close PDO connection
-$pdo = null;
-
 // Define the profile picture directory
 $profile_pics_dir = 'profile_pics/';
 $profile_picture_path = $profile_pics_dir . $profile_picture;
@@ -143,7 +135,125 @@ if (!file_exists($profile_picture_path)) {
 
 // Debugging code
 error_log("Debugging: Profile picture path is " . $profile_picture_path);
+
+// Function to fetch user storage data
+function fetchUserStorageData($username, $pdo) {
+    try {
+        $query = "SELECT gallery_storage, contacts_storage, vault_storage, documents_storage, total_storage, max_storage 
+                  FROM user_storage WHERE username = :username";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [
+            'gallery_storage' => 0,
+            'contacts_storage' => 0,
+            'vault_storage' => 0,
+            'documents_storage' => 0,
+            'total_storage' => 0,
+            'max_storage' => 1024 // 1 GB in MB
+        ];
+    } catch (PDOException $e) {
+        error_log("Error fetching user storage data: " . $e->getMessage());
+        return [
+            'gallery_storage' => 0,
+            'contacts_storage' => 0,
+            'vault_storage' => 0,
+            'documents_storage' => 0,
+            'total_storage' => 0,
+            'max_storage' => 1024 // 1 GB in MB
+        ];
+    }
+}
+
+// Fetch user storage data
+$storage_data = fetchUserStorageData($username, $pdo);
+
+// Individual page storage
+$storage_in_mb = [
+    'gallery' => $storage_data['gallery_storage'] ?? 0,
+    'contacts' => $storage_data['contacts_storage'] ?? 0,
+    'vault' => $storage_data['vault_storage'] ?? 0,
+    'documents' => $storage_data['documents_storage'] ?? 0,
+];
+
+// Calculate total and remaining storage
+$total_storage_mb = $storage_data['total_storage'] ?? 0;
+$max_storage_mb = $storage_data['max_storage'] ?? 1024; // Default to 1GB in MB
+$storage_remaining_mb = $max_storage_mb - $total_storage_mb;
+
+// Fetch user activity data
+$activity_counts = fetchUserActivityCounts($username, $pdo); // Ensure this function is defined
+$activity_last_opened = fetchUserActivityLastOpened($username, $pdo); // Ensure this function is defined
+
+// Define fetchUserActivityCounts function
+function fetchUserActivityCounts($username, $pdo) {
+    try {
+        $query = "SELECT activity_type, COUNT(*) as count FROM user_activity WHERE username = :username GROUP BY activity_type";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $activity_counts = [
+            'gallery' => 0,
+            'contacts' => 0,
+            'vault' => 0,
+            'documents' => 0
+        ];
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $activity_counts[$row['activity_type']] = $row['count'];
+        }
+
+        return $activity_counts;
+    } catch (PDOException $e) {
+        error_log("Error fetching user activity counts: " . $e->getMessage());
+        return [
+            'gallery' => 0,
+            'contacts' => 0,
+            'vault' => 0,
+            'documents' => 0
+        ];
+    }
+}
+
+// Define fetchUserActivityLastOpened function
+function fetchUserActivityLastOpened($username, $pdo) {
+    try {
+        $query = "SELECT activity_type, MAX(last_opened) as last_opened FROM user_activity WHERE username = :username GROUP BY activity_type";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $activity_last_opened = [
+            'gallery' => 'Never',
+            'contacts' => 'Never',
+            'vault' => 'Never',
+            'documents' => 'Never'
+        ];
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $activity_last_opened[$row['activity_type']] = $row['last_opened'] ? date('Y-m-d H:i:s', strtotime($row['last_opened'])) : 'Never';
+        }
+
+        return $activity_last_opened;
+    } catch (PDOException $e) {
+        error_log("Error fetching user activity last opened: " . $e->getMessage());
+        return [
+            'gallery' => 'Never',
+            'contacts' => 'Never',
+            'vault' => 'Never',
+            'documents' => 'Never'
+        ];
+    }
+}
 ?>
+
+
+
+
+
+
+
 
 
 <!DOCTYPE html>
@@ -170,7 +280,7 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
             position: absolute;
             top: 100px; /* Adjust as needed */
             left: 100px; /* Adjust as needed */
-            background: rgba(255, 255, 255, 0.8); /* Glass effect */
+            background: transparent; /* Glass effect */
             border: 1px solid #ccc;
             padding: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -192,6 +302,31 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
         .resize-handle.bottom-right {
             bottom: 0;
             right: 0;
+        }
+
+        .storage-status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress bar styles */
+        .progress-container {
+            margin-top: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-bar {
+            background-color: #4caf50;
+            height: 100%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -216,8 +351,8 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
 </header>
 
 <div class="sp">
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.21/build/spline-viewer.js" async></script>
-    <spline-viewer loading-anim-type="spinner-small-light" url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode"></spline-viewer>
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.27/build/spline-viewer.js"></script>
+<spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
 </div>
 
 <div class="user-activity floating-window">
@@ -233,13 +368,25 @@ error_log("Debugging: Profile picture path is " . $profile_picture_path);
     <div class="resize-handle bottom-right"></div>
 </div>
 
-<!-- Add storage information -->
-<div class="storage-info">
-    <h3>Storage Details</h3>
-    <p>Total Storage Used: <?php echo number_format($total_storage_mb, 2); ?> MB</p>
-    <p>Maximum Storage Allowed: <?php echo number_format($max_storage_mb, 2); ?> MB</p>
-    <p>Storage Remaining: <?php echo number_format($storage_remaining_mb, 2); ?> MB</p>
+<div class="storage-status">
+    <h3>Storage Tracker</h3>
+    <ul>
+        <li>Gallery: <?php echo $storage_in_mb['gallery'] ?? 0; ?> MB <button onclick="clearStorage('gallery')">Clear</button></li>
+        <li>Contacts: <?php echo $storage_in_mb['contacts'] ?? 0; ?> MB <button onclick="clearStorage('contacts')">Clear</button></li>
+        <li>Personal Vault: <?php echo $storage_in_mb['vault'] ?? 0; ?> MB <button onclick="clearStorage('vault')">Clear</button></li>
+        <li>Documents: <?php echo $storage_in_mb['documents'] ?? 0; ?> MB <button onclick="clearStorage('documents')">Clear</button></li>
+    </ul>
+    <div class="progress-container">
+        <label>Total Storage Used: <?php echo round($total_storage_mb, 2); ?> MB / 1024 MB</label>
+        <div class="progress-bar">
+            <div class="progress" style="width: <?php echo ($total_storage_mb / $max_storage_mb) * 100; ?>%;"></div>
+        </div>
+        <p>Remaining Storage: <?php echo round($storage_remaining_mb, 2); ?> MB</p>
+    </div>
 </div>
+
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

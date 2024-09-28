@@ -59,6 +59,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; // D
             height: 100%;
             z-index: 1; /* Ensure it stays behind other content */
         }
+        
     </style>
 </head>
 

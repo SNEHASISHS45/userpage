@@ -1,6 +1,10 @@
 <?php
 session_start();
 include 'db_connect.php'; // Ensure this file is correctly configured
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Enable error reporting
 ini_set('display_errors', 1);
@@ -47,14 +51,21 @@ function updateStorageUsage($pdo, $user_id, $sizeChange) {
     $stmt->execute();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+// Fetch current storage usage
+function getCurrentStorageUsage($pdo, $user_id) {
+    $query = "SELECT storage_used FROM storage WHERE user_id = :user_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchColumn() ?: 0; // Return 0 if no record found
 }
 
 $user_id = $_SESSION['user_id'];
 $error_message = '';
+$max_storage = 1 * 1024 * 1024 * 1024; // 1GB in bytes
+
+// Get current storage usage
+$current_storage_used = getCurrentStorageUsage($pdo, $user_id);
 
 // Handle photo upload
 if (isset($_POST['upload_photo'])) {
@@ -77,6 +88,7 @@ if (isset($_POST['upload_photo'])) {
             $target_file = $target_dir . $unique_file_name;
             $uploadOk = 1;
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $file_size = $_FILES["photo"]["size"][$i];
 
             // Check if image file is an actual image
             $check = getimagesize($_FILES["photo"]["tmp_name"][$i]);
@@ -87,7 +99,7 @@ if (isset($_POST['upload_photo'])) {
             }
 
             // Check file size (5MB limit)
-            if ($_FILES["photo"]["size"][$i] > 5000000) {
+            if ($file_size > 5000000) {
                 $uploadOk = 0;
                 $error_message .= "File " . htmlspecialchars($original_file_name) . " is too large.<br>";
                 continue; // Skip this file
@@ -100,16 +112,10 @@ if (isset($_POST['upload_photo'])) {
                 continue; // Skip this file
             }
 
-            // Check if the file already exists in the database
-            $query = "SELECT COUNT(*) FROM photos WHERE user_id = :user_id AND image_path = :image_path";
-            $stmt = $pdo->prepare($query);
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->bindParam(':image_path', $target_file);
-            $stmt->execute();
-            $count = $stmt->fetchColumn();
-            if ($count > 0) {
+            // Check if the user will exceed their storage limit
+            if (($current_storage_used + $file_size) > $max_storage) {
                 $uploadOk = 0;
-                $error_message .= "File " . htmlspecialchars($original_file_name) . " already exists.<br>";
+                $error_message .= "Uploading " . htmlspecialchars($original_file_name) . " will exceed your storage limit.<br>";
                 continue; // Skip this file
             }
 
@@ -129,7 +135,8 @@ if (isset($_POST['upload_photo'])) {
                     $stmt->execute();
 
                     // Update storage usage for the uploaded photo
-                    updateStorageUsage($pdo, $user_id, $_FILES["photo"]["size"][$i]);
+                    updateStorageUsage($pdo, $user_id, $file_size);
+                    $current_storage_used += $file_size; // Update current storage used
                 } else {
                     $error_message .= "Sorry, there was an error uploading your file " . htmlspecialchars($original_file_name) . ".<br>";
                 }
@@ -148,102 +155,100 @@ if (isset($_POST['upload_photo'])) {
 }
 
 // Handle photo deletion
-if (isset($_GET['delete_photo_id'])) {
-    $photo_id = intval($_GET['delete_photo_id']);
-
+function deletePhoto($pdo, $user_id, $photo_id) {
     // Fetch photo paths using PDO
     $query = "SELECT image_path, thumbnail_path FROM photos WHERE id = :id";
     $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':id', $photo_id);
-    $stmt->execute();
+    $stmt->execute([':id' => $photo_id]);
     $photo = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($photo) {
+        // Get storage used before deletion
+        $storage_used = filesize($photo['image_path']);
+        
         // Delete photo from database
-        $query = "DELETE FROM photos WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $photo_id);
-        $stmt->execute();
+        $stmt = $pdo->prepare("DELETE FROM photos WHERE id = :id");
+        $stmt->execute([':id' => $photo_id]);
 
         // Delete photo files
         if (file_exists($photo['image_path'])) {
             unlink($photo['image_path']);
+            updateStorageUsage($pdo, $user_id, -$storage_used); // Update storage usage
         }
         if (file_exists($photo['thumbnail_path'])) {
             unlink($photo['thumbnail_path']);
         }
 
-        // Update storage usage after deletion
-        $storage_used = $_FILES["photo"]["size"][$i] ?? 0; // Ensure valid file size
-        updateStorageUsage($pdo, $user_id, -$storage_used);
+        // Return the updated storage usage
+        return getCurrentStorageUsage($pdo, $user_id);
     }
+    return false;
+}
+
+// Handle photo deletion
+if (isset($_GET['delete_photo_id'])) {
+    $photo_id = intval($_GET['delete_photo_id']);
+    deletePhoto($pdo, $user_id, $photo_id);
 }
 
 // Handle multiple photo deletions
 if (isset($_GET['photo_ids'])) {
     $photo_ids = explode(',', $_GET['photo_ids']);
-
     foreach ($photo_ids as $photo_id) {
-        $photo_id = intval($photo_id);
-
-        // Fetch photo paths using PDO
-        $query = "SELECT image_path, thumbnail_path FROM photos WHERE id = :id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':id', $photo_id);
-        $stmt->execute();
-        $photo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($photo) {
-            // Delete photo from database
-            $query = "DELETE FROM photos WHERE id = :id";
-            $stmt = $pdo->prepare($query);
-            $stmt->bindParam(':id', $photo_id);
-            $stmt->execute();
-
-            // Delete photo files
-            if (file_exists($photo['image_path'])) {
-                unlink($photo['image_path']);
-            }
-            if (file_exists($photo['thumbnail_path'])) {
-                unlink($photo['thumbnail_path']);
-            }
-
-            // Update storage usage after deletion
-            $storage_used = file_exists($photo['image_path']) ? filesize($photo['image_path']) : 0;
-            updateStorageUsage($pdo, $user_id, -$storage_used);
-        }
+        deletePhoto($pdo, $user_id, intval($photo_id));
     }
 }
 
-// Fetch user photos
+// Function to create a thumbnail from an image
+function createThumbnail($source, $destination, $width, $height) {
+    $img = null;
+    $imageFileType = strtolower(pathinfo($source, PATHINFO_EXTENSION));
+
+    switch ($imageFileType) {
+        case 'jpg':
+        case 'jpeg':
+            $img = imagecreatefromjpeg($source);
+            break;
+        case 'png':
+            $img = imagecreatefrompng($source);
+            break;
+        case 'gif':
+            $img = imagecreatefromgif($source);
+            break;
+    }
+
+    if ($img) {
+        $thumb = imagecreatetruecolor($width, $height);
+        imagecopyresampled($thumb, $img, 0, 0, 0, 0, $width, $height, imagesx($img), imagesy($img));
+        imagejpeg($thumb, $destination, 90);
+        imagedestroy($img);
+        imagedestroy($thumb);
+    } else {
+        error_log("Failed to create thumbnail for $source");
+    }
+}
+
+// Fetch all photos for the user
 $query = "SELECT * FROM photos WHERE user_id = :user_id";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Display photos
-function createThumbnail($sourcePath, $destinationPath, $thumbWidth, $thumbHeight) {
-    list($width, $height, $type) = getimagesize($sourcePath);
-    $sourceImage = imagecreatefromstring(file_get_contents($sourcePath));
-    $thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
-    imagecopyresampled($thumb, $sourceImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $width, $height);
-    switch ($type) {
-        case IMAGETYPE_JPEG:
-            imagejpeg($thumb, $destinationPath);
-            break;
-        case IMAGETYPE_PNG:
-            imagepng($thumb, $destinationPath);
-            break;
-        case IMAGETYPE_GIF:
-            imagegif($thumb, $destinationPath);
-            break;
-    }
-    imagedestroy($sourceImage);
-    imagedestroy($thumb);
-}
 
+// After deletion logic, return the success status and the new storage usage
+if (isset($_POST['delete_photo_ids'])) {
+    $photo_ids = explode(',', $_POST['delete_photo_ids']);
+    foreach ($photo_ids as $photo_id) {
+        deletePhoto($pdo, $user_id, intval($photo_id));
+    }
+    echo json_encode(['success' => true, 'newStorageUsed' => getCurrentStorageUsage($pdo, $user_id), 'deletedPhotoIds' => $photo_ids]);
+    exit();
+}
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -255,18 +260,32 @@ function createThumbnail($sourcePath, $destinationPath, $thumbWidth, $thumbHeigh
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <header>
+<div class="sp">
+    <!-- Spline 3D Viewer -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.28/build/spline-viewer.js"></script>
+<spline-viewer loading-anim-type="spinner-small-light" url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode"></spline-viewer>
+    </div>
+<header>
     <nav>
-    <ul>
-        <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-    </ul>
-</nav>
-    </header>
-
+        <h1>Dashboard</h1>
+        <div class="nav-container">
+            <ul id="nav-menu" class="nav-menu">
+                <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
+                <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+            <div class="profile-info">
+                <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" class="profile-pic">
+                <span class="username"><?php echo $username; ?></span>
+            </div>
+        </div>
+    </nav>
+</header>
+<p>Current storage usage: <?= round($current_storage_used / (1024 * 1024), 2) ?> MB / <?= round($max_storage / (1024 * 1024), 2) ?> MB</p>
+<p style="color: red;"><?= htmlspecialchars($error_message) ?></p>
+   
     <section class="gallery">
         <h1>Your Gallery</h1>
 
@@ -282,7 +301,7 @@ function createThumbnail($sourcePath, $destinationPath, $thumbWidth, $thumbHeigh
                 <?php endif; ?>
             </form>
         </div>
-
+     
         <!-- Select All & Delete Multiple Form -->
         <div class="select-all-container">
             <input type="checkbox" id="selectAllCheckbox">
@@ -310,6 +329,48 @@ function createThumbnail($sourcePath, $destinationPath, $thumbWidth, $thumbHeigh
     </div>
 
     <script>
+
+document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+        let checkboxes = document.querySelectorAll('.photo-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    document.getElementById('deleteMultipleButton').addEventListener('click', function() {
+        let selectedIds = [];
+        document.querySelectorAll('.photo-checkbox:checked').forEach(checkbox => {
+            selectedIds.push(checkbox.getAttribute('data-photo-id'));
+        });
+
+        if (selectedIds.length > 0) {
+            if (confirm('Are you sure you want to delete the selected photos?')) {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', 'gallery.php', true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // Update storage status in the DOM
+                            document.getElementById('currentStorage').textContent = (response.newStorageUsed / (1024 * 1024)).toFixed(2);
+
+                            // Remove the deleted photos from the gallery without reloading the page
+                            response.deletedPhotoIds.forEach(photoId => {
+                                let photoElement = document.querySelector(`.photo-checkbox[data-photo-id='${photoId}']`).closest('.photo-item');
+                                if (photoElement) {
+                                    photoElement.remove(); // Remove the photo from the gallery grid
+                                }
+                            });
+                        }
+                    }
+                };
+                xhr.send('delete_photo_ids=' + selectedIds.join(','));
+            }
+        } else {
+            alert('No photos selected.');
+        }
+    });
+
+    
         let currentSlideIndex = 0;
         let slides = [];
         const modal = document.getElementById('photoModal');

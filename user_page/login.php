@@ -57,11 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_
 }
 ?>
 
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,11 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.21/build/spline-viewer.js" async></script>
 </head>
 <body>
-    <spline-viewer url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode" 
-                  loading-anim-type="spinner-small-light" 
-                  class="spline-bg">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAwCAYAAADn..." alt="Spline preview"/>
-    </spline-viewer>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.27/build/spline-viewer.js"></script>
+<spline-viewer loading-anim-type="spinner-small-light" url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode"></spline-viewer>
 
     <div class="container">
         <div class="form-wrapper">
@@ -89,12 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_
                         <input type="text" placeholder="Username" name="signup_username" required>
                     </div>
                     <div class="input-container">
-                        <i class="fas fa-lock icon"></i>
-                        <input type="password" placeholder="Password" name="signup_password" required>
-                    </div>
-                    <div class="input-container">
                         <i class="fas fa-envelope icon"></i>
                         <input type="email" placeholder="Email" name="signup_email" required>
+                    </div>
+                    <div class="input-container">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" placeholder="Password" name="signup_password" id="signup-password" required>
+                        <i id="eye" class="fas fa-eye password-toggle" onclick="togglePassword('signup-password', this)"></i>
                     </div>
                     <button type="submit">Sign Up</button>
                     <div class="form-links">
@@ -115,11 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_
                     </div>
                     <div class="input-container">
                         <i class="fas fa-lock icon"></i>
-                        <input type="password" placeholder="Password" name="login_password" required>
+                        <input type="password" placeholder="Password" name="login_password" id="login-password" required>
+                        <i id="eye" class="fas fa-eye password-toggle" onclick="togglePassword('login-password', this)"></i>
                     </div>
                     <button type="submit" value="Sign Up">Login</button>
                     <div class="form-links">
-                    <p>Don't have an account?<a href="#" onclick="showSignup()">Register</a></p>
+                        <p>Don't have an account? <a href="#" onclick="showSignup()">Register</a></p>
                     </div>
                     <?php if ($error_message): ?>
                         <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
@@ -130,19 +124,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup_username'], $_
     </div>
 
     <script>
-      function showSignup() {
-    document.getElementById('signup-form').style.transform = 'translateX(0)';
-    document.getElementById('login-form').style.transform = 'translateX(100%)';
-}
+    function showSignup() {
+        document.getElementById('signup-form').style.transform = 'translateX(0)';
+        document.getElementById('login-form').style.transform = 'translateX(100%)';
+    }
 
-function showLogin() {
-    document.getElementById('signup-form').style.transform = 'translateX(-100%)';
-    document.getElementById('login-form').style.transform = 'translateX(0)';
-}
+    function showLogin() {
+        document.getElementById('signup-form').style.transform = 'translateX(-100%)';
+        document.getElementById('login-form').style.transform = 'translateX(0)';
+    }
 
-// Initially show the login form
-showLogin();
+    function togglePassword(inputId, eyeIcon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        }
+    }
 
+    // Initially show the login form
+    showLogin();
     </script>
 </body>
 </html>

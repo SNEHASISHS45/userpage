@@ -14,7 +14,7 @@ body {
     position: relative;
 }
 
-.spline-bg {
+spline-viewer {
     position: absolute;
     top: 0;
     left: 0;
@@ -34,8 +34,8 @@ body {
 }
 
 .form-container {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
+    background-color: transparent !important;
+    backdrop-filter: blur(10px);
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -135,4 +135,7 @@ button:hover {
     color: #ff6b6b;
     margin-top: 15px;
     text-align: center;
+}
+#eye {
+    margin-left: 350px;
 }

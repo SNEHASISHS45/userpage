@@ -1,50 +1,228 @@
 /* General Styles */
+/* Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    background: #121212; /* Dark background for the Instagram dark theme */
+   
     color: #f5f5f5;
     overflow-y: scroll; /* Ensure scrolling works */
 }
 
+
+/* Header Styles */
 header {
-    background: #1f1f1f;
-    padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 15px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000; /* Above other content */
+    transition: background 0.3s ease;
 }
 
+/* Navigation Styles */
 nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between; /* Space between logo/profile and nav menu */
+    background: none; /* No background */
+    border: none; /* No border */
 }
 
 .nav-container {
-    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    max-width: 1200px; /* Optional: limit width */
     margin: 0 auto;
-    padding: 0 1rem;
+    width: 100%;
+    position: relative;
 }
 
-.nav-container a {
-    color: #e0e0e0;
+/* Brand Logo */
+.brand-logo {
+    flex: 0 0 auto; /* Don't grow or shrink */
+}
+
+.brand-logo img {
+    height: 40px; /* Adjust logo size */
+    transition: transform 0.3s ease, filter 0.3s ease;
+    box-shadow: none; /* Remove glow effect */
+}
+
+.brand-logo:hover img {
+    transform: rotate(360deg); /* Rotate on hover */
+    filter: brightness(1.2); /* Increase brightness on hover */
+}
+
+/* Navigation Menu */
+.nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    justify-content: center; /* Center nav menu items */
+}
+
+.nav-menu li {
+    position: relative;
+}
+
+.nav-menu a {
+    color: #fff; /* White text color for better contrast */
     text-decoration: none;
-    font-size: 1rem;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 20px;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 0 8px rgba(0, 0, 255, 0.6); /* Glow effect */
 }
 
-.nav-container a:hover {
-    color: #ff4081; /* Instagram-like accent color */
+.nav-menu a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #002aff;
+    transform: scale(1.05);
+    text-shadow: 0 0 12px rgba(0, 0, 255, 0.9); /* Enhanced glow on hover */
 }
 
-header a {
-    font-size: 1.2rem;
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease, left 0.3s ease;
 }
 
+.nav-menu a:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+/* Profile Info */
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff; /* White text color for consistency */
+    flex: 0 0 auto; /* Don't grow or shrink */
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover; /* Ensures the image covers the area */
+    border: 2px solid #fff; /* Optional: border for visibility */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* Glow effect */
+}
+
+.profile-pic:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    box-shadow: 0 0 15px rgba(0, 0, 255, 0.7); /* Enhanced glow on hover */
+}
+
+.username {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+/* Hamburger Menu Styles */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-left: auto; /* Push to the right end */
+    margin-right: 30px;
+}
+
+.nav-toggle:hover {
+    transform: rotate(180deg); /* Rotate on hover */
+}
+
+.nav-toggle .bar {
+    background: #fff; /* White color for visibility */
+    height: 3px;
+    width: 25px;
+    margin: 3px 0;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.nav-toggle.active .bar:nth-child(1) {
+    transform: rotate(45deg) translateY(7px);
+}
+
+.nav-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translateY(-7px);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+       background: transparent;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        border-radius: 5px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+    h1{
+        display: none;
+    }
+
+    .nav-menu.active {
+        display: flex;
+        max-height: 500px; /* Enough height to show all menu items */
+        opacity: 1;
+    }
+
+    .nav-menu li {
+        display: block;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+}
+  /* Styles for positioning the 3D background */
+  spline-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensure it stays behind other content */
+}
 section.gallery {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 1rem;
-    background: #1e1e1e;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -65,6 +243,7 @@ h1 {
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
+    margin-top: 100px;
 }
 
 .gallery-item {
@@ -216,44 +395,6 @@ h1 {
 }
 
 
-header {
-    background: #1e1e1e; /* Slightly lighter dark header background */
-    color: #e0e0e0;
-    padding: 15px;
-    text-align: center;
-    border-bottom: 1px solid #333;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-    animation: slideInHeader 1s ease-out;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-header nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-header nav ul li {
-    display: inline;
-    margin: 0 20px;
-}
-
-header nav ul li a {
-    color: #e0e0e0;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s, transform 0.3s;
-}
-
-header nav ul li a:hover {
-    color: #ff007f; /* Vibrant color on hover */
-    transform: scale(1.1);
-}
-
 
 .gallery {
     padding: 20px;
@@ -374,328 +515,4 @@ header nav ul li a:hover {
 
 .modal:hover .prev, .modal:hover .next {
     display: block;
-}
-
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #121212; /* Dark background for the Instagram dark theme */
-    color: #f5f5f5;
-    overflow-y: scroll; /* Ensure scrolling works */
-}
-
-header {
-    background: #1f1f1f;
-    padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-.nav-container a {
-    color: #e0e0e0;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.nav-container a:hover {
-    color: #ff4081; /* Instagram-like accent color */
-    transform: scale(1.05);
-}
-
-header a {
-    font-size: 1.2rem;
-}
-
-section.gallery {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background: #1e1e1e;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 1s ease-out;
-}
-
-h1 {
-    text-align: center;
-    color: #e0e0e0;
-}
-
-.error-message {
-    color: #ff4081; /* Instagram-like accent color */
-    margin-top: 1rem;
-}
-
-/* Gallery Grid */
-.gallery-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* 3D Effect and Hover Animation for Gallery Items */
-.gallery-item {
-    position: relative;
-    width: calc(33.333% - 1rem);
-    box-sizing: border-box;
-    overflow: hidden;
-    border-radius: 10px;
-    perspective: 1000px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.gallery-item:hover {
-    transform: scale(1.05) rotateY(10deg);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-    animation: hoverPulse 1s infinite;
-}
-
-.gallery-item img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.gallery-item:hover img {
-    transform: scale(1.1);
-    filter: brightness(80%) contrast(1.2);
-}
-
-/* Button Styles */
-.upload-form {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.upload-form input[type="file"] {
-    display: none; /* Hide the file input */
-}
-
-.upload-form button {
-    background: #ff4081; /* Instagram-like accent color */
-    border: none;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-}
-
-.upload-form button:hover {
-    background: #e040fb; /* Lighter accent color */
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Icon Styles */
-.upload-form button::before {
-    content: '\f093'; /* Font Awesome icon code for upload */
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    margin-right: 0.5rem;
-}
-
-.select-all-container {
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.select-all-container input[type="checkbox"] {
-    margin-right: 0.5rem;
-}
-
-.select-all-container label {
-    font-size: 1rem;
-    color: #e0e0e0;
-    cursor: pointer;
-}
-
-.select-all-container .icon {
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    font-size: 1.2rem;
-    color: #ff4081;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.select-all-container .icon:hover {
-    color: #e040fb;
-    transform: scale(1.2);
-}
-
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
-    animation: fadeIn 0.5s ease-out;
-}
-
-.modal-content {
-    margin: auto;
-    display: block;
-    width: 80%;
-    max-width: 700px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.modal:hover .modal-content {
-    transform: scale(1.05);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Previous and Next Buttons */
-.prev, .next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    padding: 16px;
-    margin-top: -50px;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    transition: background 0.3s ease, transform 0.3s ease;
-    border-radius: 0 3px 3px 0;
-    user-select: none;
-    z-index: 10;
-}
-
-.next {
-    right: 0;
-    border-radius: 3px 0 0 3px;
-}
-
-.prev:hover, .next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-    transform: scale(1.1);
-}
-
-/* Scrollbar Hidden */
-::-webkit-scrollbar {
-    display: none; /* Hides the scrollbar */
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes hoverPulse {
-    0% {
-        transform: scale(1.05);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1.05);
-    }
-}
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Slightly darker overlay */
-    overflow: hidden;
-    animation: fadeIn 0.5s ease-out;
-}
-
-.modal-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.modal-content img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Maintain aspect ratio and fit within the frame */
-    border-radius: 15px;
-    transition: transform 0.3s ease;
-}
-
-.prev, .next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    padding: 16px;
-    margin-top: -50px;
-    color: white;
-    font-weight: bold;
-    font-size: 24px;
-    transition: background 0.3s ease, transform 0.3s ease;
-    border-radius: 50%;
-    user-select: none;
-    z-index: 10;
-}
-
-.prev {
-    left: 10px;
-}
-
-.next {
-    right: 10px;
-}
-
-.prev:hover, .next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-    transform: scale(1.2);
-}
-
-/* Close Button */
-.close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 32px;
-    color: white;
-    cursor: pointer;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.close:hover {
-    color: #ff4081; /* Accent color */
-    transform: scale(1.2);
 }
