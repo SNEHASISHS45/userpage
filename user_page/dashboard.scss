@@ -33,7 +33,6 @@ header {
     top: 0;
     z-index: 1000; /* Above other content */
     transition: background 0.3s ease;
-    box-shadow: none; /* Remove glow effect */
 }
 
 /* Navigation Styles */
@@ -52,6 +51,22 @@ nav {
     margin: 0 auto;
     width: 100%;
     position: relative;
+}
+
+/* Brand Logo */
+.brand-logo {
+    flex: 0 0 auto; /* Don't grow or shrink */
+}
+
+.brand-logo img {
+    height: 40px; /* Adjust logo size */
+    transition: transform 0.3s ease, filter 0.3s ease;
+    box-shadow: none; /* Remove glow effect */
+}
+
+.brand-logo:hover img {
+    transform: rotate(360deg); /* Rotate on hover */
+    filter: brightness(1.2); /* Increase brightness on hover */
 }
 
 /* Navigation Menu */
@@ -76,12 +91,37 @@ nav {
     padding: 12px 20px;
     border-radius: 20px;
     transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 0 8px rgba(0, 0, 255, 0.6); /* Glow effect */
 }
 
 .nav-menu a:hover {
-    background: rgba(255, 255, 255, 0.2); /* Light background on hover */
-    color: #00B7FF; /* Highlight color */
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #002aff;
     transform: scale(1.05);
+    text-shadow: 0 0 12px rgba(0, 0, 255, 0.9); /* Enhanced glow on hover */
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
+    left: 0;
 }
 
 /* Profile Info */
@@ -183,7 +223,6 @@ nav {
         display: flex;
     }
 }
-
 
 .dashboard-section{
     padding-top: 100px;

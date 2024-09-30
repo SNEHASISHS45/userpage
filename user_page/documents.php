@@ -27,12 +27,28 @@ function updateActivity($pdo, $user_id, $activity_type) {
     $stmt->execute();
 }
 
+// Define storage limits
+$max_storage = 1073741824; // 1GB in bytes
+$current_storage_used = 0;
+
+// Fetch current storage usage for the user
+$query = "SELECT SUM(storage_size) FROM documents WHERE user_id = :user_id"; // Adjust if you have a separate table for storage
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$current_storage_used = $stmt->fetchColumn();
+$stmt->closeCursor(); // Close the cursor after fetching
+
+// Calculate remaining storage
+$storage_remaining = $max_storage - ($current_storage_used ?: 0);
+
 // Handle document upload
 if (isset($_POST['upload_document'])) {
     if (isset($_FILES['document']) && !empty(array_filter($_FILES['document']['name']))) {
         $file_count = count($_FILES['document']['name']);
         $target_dir = "uploads/documents/";
 
+        // Ensure upload directory exists
         if (!is_dir($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -43,6 +59,13 @@ if (isset($_POST['upload_document'])) {
             $target_file = $target_dir . $unique_file_name;
             $uploadOk = 1;
             $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+            // Check for upload errors
+            if ($_FILES["document"]["error"][$i] !== UPLOAD_ERR_OK) {
+                $uploadOk = 0;
+                $error_message .= "Error uploading file " . htmlspecialchars($original_file_name) . ".<br>";
+                continue; // Skip this file
+            }
 
             // Check file size (10MB limit)
             if ($_FILES["document"]["size"][$i] > 10000000) {
@@ -76,20 +99,29 @@ if (isset($_POST['upload_document'])) {
 
             // If everything is ok, try to upload the file
             if ($uploadOk == 1) {
-                if (move_uploaded_file($_FILES["document"]["tmp_name"][$i], $target_file)) {
-                    // Insert document information into the database using PDO
-                    try {
-                        $query = "INSERT INTO documents (user_id, file_path, category) VALUES (:user_id, :file_path, :category)";
-                        $stmt = $pdo->prepare($query);
-                        $stmt->bindParam(':user_id', $user_id);
-                        $stmt->bindParam(':file_path', $target_file);
-                        $stmt->bindParam(':category', $category);
-                        $stmt->execute();
-                    } catch (PDOException $e) {
-                        $error_message .= "Database error: " . $e->getMessage() . "<br>";
+                // Check if there is enough space to upload
+                if ($_FILES["document"]["size"][$i] + $current_storage_used <= $max_storage) {
+                    if (move_uploaded_file($_FILES["document"]["tmp_name"][$i], $target_file)) {
+                        // Get the file size
+                        $file_size = filesize($target_file);
+
+                        // Insert document information into the database using PDO
+                        try {
+                            $query = "INSERT INTO documents (user_id, file_path, category, storage_size) VALUES (:user_id, :file_path, :category, :storage_size)";
+                            $stmt = $pdo->prepare($query);
+                            $stmt->bindParam(':user_id', $user_id);
+                            $stmt->bindParam(':file_path', $target_file);
+                            $stmt->bindParam(':category', $category);
+                            $stmt->bindParam(':storage_size', $file_size); // Bind file size
+                            $stmt->execute();
+                        } catch (PDOException $e) {
+                            $error_message .= "Database error: " . $e->getMessage() . "<br>";
+                        }
+                    } else {
+                        $error_message .= "Sorry, there was an error uploading your file " . htmlspecialchars($original_file_name) . ".<br>";
                     }
                 } else {
-                    $error_message .= "Sorry, there was an error uploading your file " . htmlspecialchars($original_file_name) . ".<br>";
+                    $error_message .= "Not enough storage space available for " . htmlspecialchars($original_file_name) . ".<br>";
                 }
             }
         }
@@ -156,6 +188,32 @@ if (isset($_GET['document_ids'])) {
     }
 }
 
+// Fetch user profile information
+$query = "SELECT profile_picture FROM users WHERE id = :id";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$profile_picture = $stmt->fetchColumn(); // Fetch a single column value
+$stmt->closeCursor(); // Close the cursor to allow another statement to be executed
+
+// Define the path to the profile pictures directory
+$profile_pics_dir = 'profile_pics/';
+$profile_picture_path = $profile_pics_dir . $profile_picture;
+
+// Use default picture if the profile picture does not exist
+if (!file_exists($profile_picture_path) || empty($profile_picture)) {
+    $profile_picture_path = 'profile_pics/default-profile.png'; // Default profile picture path
+}
+
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; // Default to 'Guest' if not set
+
+// Fetch all photos for the user
+$query = "SELECT * FROM photos WHERE user_id = :user_id";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Fetch user's important and regular documents from the database using PDO
 $query = "SELECT id, file_path, category FROM documents WHERE user_id = :user_id";
 $stmt = $pdo->prepare($query);
@@ -163,8 +221,15 @@ $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$pdo = null; // Close PDO connection
 ?>
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,22 +239,37 @@ $pdo = null; // Close PDO connection
     <link rel="stylesheet" href="documents.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
+<header>
+    <nav>
+        <h1>Documents</h1>
+        <div class="nav-container">
+            <ul id="nav-menu" class="nav-menu">
                 <li><a href="home.php"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.php"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Settings</a></li>
+                <li><a href="logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
             </ul>
-        </nav>
-    </header>
+            <div class="profile-info">
+                <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" class="profile-pic">
+                <span class="username"><?php echo $username; ?></span>
+            </div>
+        </div>
+    </nav>
+</header>
 
+
+<p>Current storage usage: <?= round($current_storage_used / (1024 * 1024), 2) ?> MB / <?= round($max_storage / (1024 * 1024), 2) ?> MB</p>
+<p style="color: red;"><?= htmlspecialchars($error_message) ?></p>
+
+
+<div class="sp">
+    <!-- Spline 3D Viewer -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.28/build/spline-viewer.js"></script>
+<spline-viewer loading-anim-type="spinner-small-light" url="https://prod.spline.design/8TpOImH7QKlXoUTY/scene.splinecode"></spline-viewer>
+    </div>
     <div class="content">
         <section class="documents">
-            <h1>Your Documents</h1>
-
             <!-- Upload Document Form -->
             <div class="upload-form">
                 <h2>Upload Document</h2>
@@ -225,6 +305,7 @@ $pdo = null; // Close PDO connection
 
             <!-- Document List -->
             <div class="document-list">
+            <h1>Your Documents</h1>
                 <!-- Important Documents -->
                 <div class="document-category important-documents">
                     <h2>Important Documents</h2>
