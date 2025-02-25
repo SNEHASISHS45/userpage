@@ -1,0 +1,128 @@
+
+
+.container {
+    max-width: 60rem;
+    margin: 50px auto;
+    padding: 20px;
+    background: #1e1e1eb7;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+    position: relative;
+    top: 2rem;
+}
+
+h3 {
+    color: #ffffff;
+}
+
+/* File Upload */
+input[type="file"] {
+    background: #222;
+    color: #ddd;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    display: block;
+    margin: 10px auto;
+}
+
+/* Buttons */
+button {
+    background: #0a0a0a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #121212;
+}
+
+.document-list {
+    display: flex;
+    gap: 20px;
+    top: -20rem;
+}
+
+/* Document Items */
+.document-item {
+    width: 40%;
+    background: #222;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
+}
+
+/* Document Preview */
+.document-preview {
+    width: 90%;
+    height: 200px;
+    border-radius: 5px;
+    margin-top: 10px;
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-preview img, .document-preview embed, .document-preview iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+/* Action Buttons */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.actions a, .actions button {
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 18px;
+}
+
+/* View, Download, Delete, Rename */
+.view { background: #03dac6; }
+.view:hover { background: #018786; }
+
+.download { background: #2196f3; }
+.download:hover { background: #1565c0; }
+
+.delete-btn { background: #d32f2f; border: none; }
+.delete-btn:hover { background: #b71c1c; }
+
+.rename-btn { background: #ff9800; border: none; }
+.rename-btn:hover { background: #e65100; }
+
+/* Rename Form */
+.rename-form {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.rename-form input {
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .container {
+        max-width: 90%;
+        padding: 15px;
+    }
+}

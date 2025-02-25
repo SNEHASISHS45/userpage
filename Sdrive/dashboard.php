@@ -1,9 +1,9 @@
 <?php
 session_start();
-include 'config.php';
+require 'config.php'; // Include database connection
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
 if (!isset($_SESSION['user_id'])) {
@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $user_data = null;
-
 
 if ($user_id) {
     $sql = "SELECT * FROM users WHERE id='$user_id'";
@@ -44,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = mysqli_prepare($conn, $update_sql);
     
     // Bind parameters - 6 variables (username, email, phone, password, profile_pic, user_id)
-    mysqli_stmt_bind_param($stmt, "ssssss", $username, $email, $phone, $password, $profile_pic, $user_id);
+    mysqli_stmt_bind_param($stmt, "sssssi", $username, $email, $phone, $password, $profile_pic, $user_id);
 
     // Execute the statement
     if (mysqli_stmt_execute($stmt)) {
@@ -55,8 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error updating record: " . mysqli_error($conn);
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -64,66 +61,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Yourdrive - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="css/dashboard/dashboard.css">
 </head>
 <body>
-
-<header class="header">
-        <nav class="nav-container">
-            <a href="#" class="logo">Yourdrive</a>
-            <ul class="nav-links">
-                <li><a href="index.php" class="active">Home</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Services</a></li>
-                <li class="user-info dropdown">
-                    <div >
-                        <div class="dropdown-content">
-                            <a href="dashboard.php">Dashboard</a>
-                            <a href="logout.php">Logout</a>
-                        </div>
-                    </div>
-                    <?php
-                    if (isset($_SESSION['user_id'])) {
-                        $user_id = $_SESSION['user_id'];
-                        $sql = "SELECT * FROM users WHERE id='$user_id'";
-                        $result = mysqli_query($conn, $sql);
-                        $user_data = mysqli_fetch_assoc($result);
-                    
-                        if ($user_data) {
-                            echo "<div class='user-info'>";
-                            echo "<img src='" . (!empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png') . "' alt='Profile Picture' class='profile-pic1'>";
-                            echo "<p class='username'>" . htmlspecialchars($user_data['username']) . "</p>";
-                            echo "</div>";
-                        }
-                    } else {
-                        echo "User ID is not set.";
-                    }
-                    
-                    ?>
-                </li>
-            </ul>
-        </nav>
-    </header>
 
 
 
 <div class="card">
-  <div class="tools">
-    <div class="circle">
-      <span class="red box"></span>
+    <div class="tools">
+        <div class="circle">
+            <span class="red box"></span>
+        </div>
+        <div class="circle">
+            <span class="yellow box"></span>
+        </div>
+        <div class="circle">
+            <span class="green box"></span>
+        </div>
     </div>
-    <div class="circle">
-      <span class="yellow box"></span>
-    </div>
-    <div class="circle">
-      <span class="green box"></span>
-    </div>
-  </div>
-  <div class="card__content">
-  <div class="dashboard-header">
-  <h1 class="dashboard-title">Yourdrive Dashboard</h1>
-  <div class="profile-section">
-  <img src="<?php echo !empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png'; ?>" alt="Profile Picture" class="profile-pic" id="profile-pic">
+    <div class="card__content">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Yourdrive Dashboard</h1>
+            <div class="profile-section">
+                <img src="<?php echo !empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png'; ?>" alt="Profile Picture" class="profile-pic" id="profile-pic">
                 <div class="profile-info">
                     <form method="POST" action="" enctype="multipart/form-data">
                         <input class="input" type="text" name="username" value="<?php echo $user_data['username']; ?>" placeholder="Username">
@@ -136,30 +96,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         </div>
-  </div>
+        <div class="dashboard-sections">
+            <div class="section">
+                <h2>Photo Gallery</h2>
+                <p>View and manage your photo gallery.</p>
+                <a href="photos.php" class="button">Go to Gallery</a>
+            </div>
+            <div class="section">
+                <h2>Contacts Backup</h2>
+                <p>Backup your contacts to our secure storage.</p>
+                <a href="contacts.php" class="button">Backup Contacts</a>
+            </div>
+            <div class="section">
+                <h2>Documents Backup</h2>
+                <p>Backup your documents to our secure storage.</p>
+                <a href="documents.php" class="button">Backup Documents</a>
+            </div>
+            <div class="section">
+                <h2>Vault</h2>
+                <p>Store your sensitive files securely.</p>
+                <a href="vaults.php" class="button">Access Vault</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-    <script>
-        function sendNotification(title, message) {
-            if (Notification.permission === "granted") {
-                new Notification(title, {
-                    body: message,
-                    icon: "default-avatar.png"
-                });
-            }
-        }
-
-        if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    sendNotification("Welcome to Yourdrive!", "You have new notifications!");
-                }
+<script>
+    function sendNotification(title, message) {
+        if (Notification.permission === "granted") {
+            new Notification(title, {
+                body: message,
+                icon: "default-avatar.png"
             });
         }
-    </script>
+    }
+
+    if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                sendNotification("Welcome to Yourdrive!", "You have new notifications!");
+            }
+        });
+    }
+</script>
 </body>
 </html>
-
-
-
-

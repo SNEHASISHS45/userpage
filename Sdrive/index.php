@@ -1,26 +1,51 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+ob_start();
+session_start();
+
+require 'config.php'; // Include database connection
+
+if (!isset($_SESSION["user_id"])) {
+    header("Location: login.php");
+    exit();
 }
-require 'config.php';
 
-if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
-    $token = $_COOKIE['remember_me'];
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    $stmt = $conn->prepare("SELECT id, remember_token FROM users WHERE remember_token IS NOT NULL");
+// Check Remember Me Before Redirect
+if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_me"]) && isset($_COOKIE["user_id"])) {
+    $token = $_COOKIE["remember_me"];
+    $user_id = $_COOKIE["user_id"];
+
+    $stmt = $conn->prepare("SELECT id, username, profile_picture, remember_token FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $stmt->bind_result($user_id, $stored_token);
+    $stmt->store_result();
 
-    while ($stmt->fetch()) {
-        if (password_verify($token, $stored_token)) {
-            $_SESSION["user_id"] = $user_id;
-            header("Location: dashboard.php");
-            exit();
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($id, $username, $profile_picture, $stored_hashed_token);
+        $stmt->fetch();
+
+        if (password_verify($token, $stored_hashed_token)) {
+            // Set session variables
+            $_SESSION["user_id"] = $id;
+            $_SESSION["username"] = $username;
+            $_SESSION["profile_picture"] = $profile_picture;
+            session_regenerate_id(true); // Prevent session fixation
+        } else {
+            // Invalid token - clear cookies
+            setcookie("remember_me", "", time() - 3600, "/", "", false, true);
+            setcookie("user_id", "", time() - 3600, "/", "", false, true);
         }
     }
     $stmt->close();
 }
 
+// Now, Redirect if Session is Still Not Set
+
+
+ob_end_flush();
 ?>
 
 
@@ -35,52 +60,57 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 </head>
 
 <body>
 <header class="header">
-    <nav class="nav-container">
-        <a href="#" class="logo">Yourdrive</a>
-        <ul class="nav-links">
-            <li><a href="index.php" class="active">HOME</a></li>
-            <li><a href="photos.php">PHOTOS</a></li>
-            <li><a href="vault.php">VAULTS</a></li>
-            <li class="user-info dropdown">
-                <div>
-                    <div class="dropdown-content">
-                        <a href="dashboard.php">Dashboard</a>
-                        <a href="logout.php">Logout</a>
-                        <hr>
-                        <p>Switch Account</p>
-                        <div id="saved-accounts"></div>
-                    </div>
-                    <?php
-                    if (isset($_SESSION['user_id'])) {
-                        $user_id = $_SESSION['user_id'];
-                        $sql = "SELECT * FROM users WHERE id='$user_id'";
-                        $result = mysqli_query($conn, $sql);
-                        $user_data = mysqli_fetch_assoc($result);
+<div class="logo_container">
+            <a href="index.php" class="logo">SNEHASISH</a>
+            </div>
+        <nav class="nav-container">
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.php" class="active">HOME</a></li>
+                <li><a href="dashboard.php">DASHBOARD</a></li>
+                <li><a href="vaults.php">VAULTS</a></li>
+                </ul>
+                <div class="user-info dropdown">
+                    <div>
+                        <div class="dropdown-content">
+                            <a href="logout.php">Logout</a>
+                            <hr>
+                            <p>Switch Account</p>
+                            <div id="saved-accounts"></div>
+                        </div>
+                        <?php
+                        if (isset($_SESSION['user_id'])) {
+                            $user_id = $_SESSION['user_id'];
+                            $sql = "SELECT * FROM users WHERE id='$user_id'";
+                            $result = mysqli_query($conn, $sql);
+                            $user_data = mysqli_fetch_assoc($result);
 
-                        if ($user_data) {
-                            echo "<div class='user-info'>";
-                            $profile_pic = !empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png';
-                            echo "<img src='" . $profile_pic . "' class='profile-pic'>";
-                            echo "<p class='username'>" . htmlspecialchars($user_data['username']) . "</p>";
-                            echo "</div>";
+                            if ($user_data) {
+                                echo "<div class='user-info'>";
+                                $profile_pic = !empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png';
+                                echo "<img src='" . $profile_pic . "' class='profile-pic'>";
+                                echo "<p class='username'>" . htmlspecialchars($user_data['username']) . "</p>";
+                                echo "</div>";
+                            }
                         }
-                    }
-                    ?>
+                        ?>
+                    </div>
                 </div>
-            </li>
-        </ul>
-    </nav>
-</header>
+            
+        </nav>
+    </header>
 
 
     
 
-<div class="main">
+    <div class="main">
     <div class="secphotos section" id="secphotos">
         <?php
         include 'photos.php';
@@ -104,11 +134,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         include 'vaults.php';
         ?>
     </div>
- </div>
+    </div>
 
  
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.68/build/spline-viewer.js"></script>
-    <spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
+ <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.69/build/spline-viewer.js"></script>
+ <spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
 
 
 
@@ -175,6 +205,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
 
 <script>
+   
    
 
     "use strict"; 

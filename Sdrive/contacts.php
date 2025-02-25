@@ -14,20 +14,29 @@ if (!isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Backup</title>
-    <link rel="stylesheet" href="contacts.css">
+    <link rel="stylesheet" href="css/contacts/contacts.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<div class="container">
-        <h1>Contact Backup</h1>
-        
-        <form id="addContactForm">
+
+<h1>Contacts</h1>
+
+
+<div class="fc">
+<form id="addContactForm">
             <input type="text" id="name" placeholder="Contact Name" required>
             <input type="tel" id="phone" placeholder="Phone Number" required pattern="[0-9]{10,15}" title="Enter a valid phone number (10-15 digits)">
             <input type="text" id="group" placeholder="Group Name">
-            <button type="submit">➕ Add</button>
+            <button type="submit" style="background-color:rgba(38, 186, 255, 0.82);"><i class="fa-solid fa-user-plus"></i> ADD</button>
         </form>
-        
+        </div>
+
+        <div class="scarch">
         <input type="text" id="search" placeholder="🔍 Search contacts...">
+        </div>
+
+
+<div class="container1">
         
         <table>
             <thead>
@@ -103,9 +112,9 @@ if (!isset($_SESSION['user_id'])) {
                         <td>${contact.phone}</td>
                         <td>${contact.group_name || "N/A"}</td>
                         <td>
-                            <button onclick="renameContact(${contact.id})">✏️ Rename</button>
-                            <button onclick="updateGroup(${contact.id})">🔄 Update Group</button>
-                            <button onclick="deleteContact(${contact.id})">❌ Delete</button>
+                            <button onclick="renameContact(${contact.id})" style="background-color: #318CE7;"><i class="fa-solid fa-user-pen"></i></button>
+                            <button onclick="updateGroup(${contact.id})" style="background-color:rgb(237, 165, 116);"><i class="fa-solid fa-people-group"></i></button>
+                            <button onclick="deleteContact(${contact.id})" style="background-color: #FF033E;"><i class="fa-solid fa-eraser"></i></button>
                         </td>
                     `;
                     list.appendChild(row);

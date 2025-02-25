@@ -75,6 +75,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
             $_SESSION["username"] = $username;
             $_SESSION["profile_picture"] = $profile_picture;
 
+            // Set a cookie to remember the user
+            $token = bin2hex(random_bytes(16));
+            setcookie("login_token", $token, time() + (86400 * 30), "/"); // 30 days expiration
+
+            // Store the token in the database
+            $stmt = $conn->prepare("UPDATE users SET login_token = ? WHERE id = ?");
+            $stmt->bind_param("si", $token, $id);
+            $stmt->execute();
+            $stmt->close();
+
             // JavaScript prompt for profile saving
             echo "<script>
                 if (confirm('Do you want to save this login for quick switching?')) {
@@ -94,6 +104,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
         $stmt->close();
     }
 }
+
+// Auto-login with cookie
+if (isset($_COOKIE["login_token"])) {
+    $token = $_COOKIE["login_token"];
+
+    $stmt = $conn->prepare("SELECT id, username, profile_picture FROM users WHERE login_token = ?");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($id, $username, $profile_picture);
+        $stmt->fetch();
+
+        $_SESSION["user_id"] = $id;
+        $_SESSION["username"] = $username;
+        $_SESSION["profile_picture"] = $profile_picture;
+
+        header("Location: index.php");
+        exit();
+    }
+    $stmt->close();
+}
 ?>
 
 
@@ -105,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login & Signup</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="css/login/login.css">
 </head>
 <body>
     <div class="spline2">

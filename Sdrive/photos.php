@@ -15,7 +15,10 @@ if (!isset($_SESSION['user_id'])) {
     die("You must be logged in to access this page.");
 }
 
-$userId = $_SESSION['user_id'];  // Get logged-in user's ID
+$userId = $_SESSION['user_id']; // Get logged-in user's ID
+
+// Allowed file types
+$allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'application/pdf', 'text/plain'];
 
 // Handle File Upload
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["photos"])) {
@@ -27,51 +30,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["photos"])) {
 
     foreach ($_FILES["photos"]["tmp_name"] as $key => $tmpName) {
         $fileName = basename($_FILES["photos"]["name"][$key]);
-        $filePath = $uploadDir . $fileName;
+        $fileType = mime_content_type($tmpName);
+        $filePath = "uploads/$userId/" . time() . "_" . $fileName;
 
-        if (move_uploaded_file($tmpName, $filePath)) {
-            $stmt = $conn->prepare("INSERT INTO photos (filename, user_id) VALUES (?, ?)");
-            $stmt->bind_param("si", $fileName, $userId);
-            $stmt->execute();
+        // Validate file type
+        if (!in_array($fileType, $allowedTypes)) {
+            echo "Invalid file type: $fileType";
+            continue;
+        }
+
+        if (move_uploaded_file($tmpName, __DIR__ . "/" . $filePath)) {
+            // Check for duplicate entries
+            $checkStmt = $conn->prepare("SELECT id FROM photos WHERE filename = ? AND user_id = ?");
+            $checkStmt->bind_param("si", $fileName, $userId);
+            $checkStmt->execute();
+            $checkStmt->store_result();
+
+            if ($checkStmt->num_rows === 0) {
+                $stmt = $conn->prepare("INSERT INTO photos (filename, user_id, filepath) VALUES (?, ?, ?)");
+                $stmt->bind_param("sis", $fileName, $userId, $filePath);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            $checkStmt->close();
         }
     }
-    header("Location: index.php");
-    exit;
+
+    header("Location: index.php"); // Redirect after upload
+    exit();
 }
 
 // Handle Photo Deletion
 if (isset($_POST['delete_id'])) {
     $photoId = $_POST['delete_id'];
 
-    $stmt = $conn->prepare("SELECT filename FROM photos WHERE id = ? AND user_id = ?");
+    $stmt = $conn->prepare("SELECT filepath FROM photos WHERE id = ? AND user_id = ?");
     $stmt->bind_param("ii", $photoId, $userId);
     $stmt->execute();
-    $stmt->bind_result($fileName);
+    $stmt->bind_result($filePath);
     $stmt->fetch();
     $stmt->close();
 
-    if ($fileName) {
-        unlink("uploads/$userId/" . $fileName);
+    if ($filePath && file_exists(__DIR__ . "/" . $filePath)) {
+        unlink(__DIR__ . "/" . $filePath);
         $stmt = $conn->prepare("DELETE FROM photos WHERE id = ? AND user_id = ?");
         $stmt->bind_param("ii", $photoId, $userId);
         $stmt->execute();
+        $stmt->close();
     }
 
     echo "Deleted successfully!";
-    exit;
+    exit();
 }
 
 // Handle Image Title Update
 if (isset($_POST['update_title'])) {
     $photoId = $_POST['update_id'];
-    $newTitle = $_POST['new_title'];
+    $newTitle = htmlspecialchars($_POST['new_title']);
 
     $stmt = $conn->prepare("UPDATE photos SET title = ? WHERE id = ? AND user_id = ?");
     $stmt->bind_param("sii", $newTitle, $photoId, $userId);
     $stmt->execute();
 
     echo "Title updated successfully!";
-    exit;
+    exit();
 }
 
 // Fetch Images from Database (Only for the logged-in user)
@@ -82,6 +105,8 @@ $result = $stmt->get_result();
 ob_end_flush();
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,7 +115,7 @@ ob_end_flush();
     <title>Photo Gallery</title>
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Rounded" rel="stylesheet">
-    <link rel="stylesheet" href="photos.css">
+    <link rel="stylesheet" href="css/photos/photos.css">
 
  
 </head>
@@ -123,7 +148,7 @@ ob_end_flush();
                 <div class="fluid-container">
                     <div class="item">
                         <div class="img">
-                            <img src="uploads/<?= htmlspecialchars($row['filename']) ?>" alt="Gallery Image">
+                        <img src="<?= htmlspecialchars($row['filepath']) ?>" alt="Gallery Image">
                         </div>
                         <div class="info">
                             <span class="title"><?= htmlspecialchars($row['title'] ?? $row['filename']) ?></span>
