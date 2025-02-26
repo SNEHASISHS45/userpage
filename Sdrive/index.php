@@ -94,7 +94,7 @@ ob_end_flush();
 
                             if ($user_data) {
                                 echo "<div class='user-info'>";
-                                $profile_pic = !empty($user_data['profile_pic']) ? 'upload/' . $user_data['profile_pic'] : 'default-avatar.png';
+                                $profile_pic = !empty($user_data['profile_pic']) ? htmlspecialchars($user_data['profile_pic']) : 'default-avatar.png';
                                 echo "<img src='" . $profile_pic . "' class='profile-pic'>";
                                 echo "<p class='username'>" . htmlspecialchars($user_data['username']) . "</p>";
                                 echo "</div>";
@@ -110,31 +110,31 @@ ob_end_flush();
 
     
 
-    <div class="main">
-    <div class="secphotos section" id="secphotos">
-        <?php
-        include 'photos.php';
-        ?>
-    </div>
+        <div class="main">
+        <div class="secphotos section" id="secphotos">
+            <?php
+            include 'photos.php';
+            ?>
+        </div>
 
-    <div class="seccontacts section" id="seccontacts">
-        <?php
-        include 'contacts.php';
-        ?>
-    </div>
+        <div class="seccontacts section" id="seccontacts">
+            <?php
+            include 'contacts.php';
+            ?>
+        </div>
 
-    <div class="secdocuments section" id="secdocuments">
-        <?php
-        include 'documents.php';
-        ?>
-    </div>
+        <div class="secdocuments section" id="secdocuments">
+            <?php
+            include 'documents.php';
+            ?>
+        </div>
 
-    <div class="secvaults section" id="secvaults">
-        <?php
-        include 'vaults.php';
-        ?>
-    </div>
-    </div>
+        <div class="secvaults section" id="secvaults">
+            <?php
+            include 'vaults.php';
+            ?>
+        </div>
+        </div>
 
  
  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.69/build/spline-viewer.js"></script>
@@ -148,10 +148,10 @@ ob_end_flush();
 
 <nav role="navigation" class="nav-menu-2 w-nav-menu menu">
 
-<button class="floating-nav__link w-nav-link menu__item active" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secphotos')">photos</button>
-<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('seccontacts')">contacts</button>
-<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secdocuments')">documents</button>
-<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secvaults')">vaults</button>
+<button class="floating-nav__link w-nav-link menu__item active" style="color: whitesmoke;" onclick="toggleDiv('secphotos')">Photos</button>
+<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('seccontacts')">Contacts</button>
+<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secdocuments')">Documents</button>
+<button class="floating-nav__link w-nav-link menu__item" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secvaults')">Notes</button>
       <div class="w-nav-button">
         <div class="w-icon-nav-menu"></div>
       </div>

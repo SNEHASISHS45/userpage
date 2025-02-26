@@ -4,42 +4,42 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+
 include 'config.php';
+include 'cloudinary_config.php';
+
+use Cloudinary\Api\Upload\UploadApi;
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
     die("You must be logged in to access this page.");
 }
 
-$userId = $_SESSION['user_id']; // Get logged-in user's ID
+$userId = $_SESSION['user_id'];
 
-// Allowed file types
 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'application/pdf', 'text/plain'];
 
-// Handle File Upload
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["photos"])) {
-    $uploadDir = __DIR__ . "/uploads/$userId/";
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-
     foreach ($_FILES["photos"]["tmp_name"] as $key => $tmpName) {
         $fileName = basename($_FILES["photos"]["name"][$key]);
         $fileType = mime_content_type($tmpName);
-        $filePath = "uploads/$userId/" . time() . "_" . $fileName;
 
-        // Validate file type
         if (!in_array($fileType, $allowedTypes)) {
             echo "Invalid file type: $fileType";
             continue;
         }
 
-        if (move_uploaded_file($tmpName, __DIR__ . "/" . $filePath)) {
+        try {
+            // Upload to Cloudinary
+            $upload = (new UploadApi())->upload($tmpName, [
+                'folder' => "sdrive_backup/$userId",
+                'public_id' => pathinfo($fileName, PATHINFO_FILENAME),
+            ]);
+            $cloudinaryUrl = $upload['secure_url'];
+
             // Check for duplicate entries
             $checkStmt = $conn->prepare("SELECT id FROM photos WHERE filename = ? AND user_id = ?");
             $checkStmt->bind_param("si", $fileName, $userId);
@@ -48,20 +48,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["photos"])) {
 
             if ($checkStmt->num_rows === 0) {
                 $stmt = $conn->prepare("INSERT INTO photos (filename, user_id, filepath) VALUES (?, ?, ?)");
-                $stmt->bind_param("sis", $fileName, $userId, $filePath);
+                $stmt->bind_param("sis", $fileName, $userId, $cloudinaryUrl);
                 $stmt->execute();
                 $stmt->close();
             }
-
             $checkStmt->close();
+        } catch (Exception $e) {
+            echo "Upload error: " . $e->getMessage();
         }
     }
 
-    header("Location: index.php"); // Redirect after upload
+    header("Location: index.php");
     exit();
 }
 
-// Handle Photo Deletion
+// Handle Image Deletion
 if (isset($_POST['delete_id'])) {
     $photoId = $_POST['delete_id'];
 
@@ -72,8 +73,14 @@ if (isset($_POST['delete_id'])) {
     $stmt->fetch();
     $stmt->close();
 
-    if ($filePath && file_exists(__DIR__ . "/" . $filePath)) {
-        unlink(__DIR__ . "/" . $filePath);
+    if ($filePath) {
+        // Extract Cloudinary Public ID
+        $publicId = basename(parse_url($filePath, PHP_URL_PATH));
+        $publicId = str_replace(['sdrive_backup/', '.jpg', '.png', '.webp', '.gif', '.mp4', '.pdf'], '', $publicId);
+
+        // Delete from Cloudinary
+        (new UploadApi())->destroy("sdrive_backup/$userId/$publicId");
+
         $stmt = $conn->prepare("DELETE FROM photos WHERE id = ? AND user_id = ?");
         $stmt->bind_param("ii", $photoId, $userId);
         $stmt->execute();
@@ -84,7 +91,7 @@ if (isset($_POST['delete_id'])) {
     exit();
 }
 
-// Handle Image Title Update
+// Handle Title Update
 if (isset($_POST['update_title'])) {
     $photoId = $_POST['update_id'];
     $newTitle = htmlspecialchars($_POST['new_title']);
@@ -92,18 +99,20 @@ if (isset($_POST['update_title'])) {
     $stmt = $conn->prepare("UPDATE photos SET title = ? WHERE id = ? AND user_id = ?");
     $stmt->bind_param("sii", $newTitle, $photoId, $userId);
     $stmt->execute();
+    $stmt->close();
 
     echo "Title updated successfully!";
     exit();
 }
 
-// Fetch Images from Database (Only for the logged-in user)
+// Fetch Photos
 $stmt = $conn->prepare("SELECT * FROM photos WHERE user_id = ? ORDER BY uploaded_at DESC");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 ob_end_flush();
 ?>
+
 
 
 
@@ -123,9 +132,6 @@ ob_end_flush();
 
 
     <section class="gallery">
-        <div class="row">
-            <h2>Photo Gallery</h2>
-        </div>
         
         <div class="upload-form">
             <form action="" method="post" enctype="multipart/form-data">
@@ -148,7 +154,7 @@ ob_end_flush();
                 <div class="fluid-container">
                     <div class="item">
                         <div class="img">
-                        <img src="<?= htmlspecialchars($row['filepath']) ?>" alt="Gallery Image">
+                        <img src="<?= htmlspecialchars($row['filepath'] . '?w=300&h=300&c=fill&f_auto&q_auto') ?>" alt="Gallery Image">
                         </div>
                         <div class="info">
                             <span class="title"><?= htmlspecialchars($row['title'] ?? $row['filename']) ?></span>

@@ -19,7 +19,6 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
 
-<h1>Contacts</h1>
 
 
 <div class="fc">
