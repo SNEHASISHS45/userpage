@@ -17,9 +17,10 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="css/contacts/contacts.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body>
+<body >
 
-
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.69/build/spline-viewer.js"></script>
+ <spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
 
 <div class="fc">
 <form id="addContactForm">
@@ -46,7 +47,7 @@ if (!isset($_SESSION['user_id'])) {
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="contactList"></tbody>
+            <tbody id="contactList" style="color: whitesmoke; font-family: 'Courier New', Courier, monospace; font-weight: 900; font-display: swap; font-size: 17px;"></tbody>
         </table>
     </div>
 

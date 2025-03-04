@@ -1,128 +1,221 @@
 
 
-.container {
-    max-width: 60rem;
-    margin: 50px auto;
+
+.upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
     padding: 20px;
-    background: #1e1e1eb7;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
-    position: relative;
-    top: 2rem;
-}
-
-h3 {
-    color: #ffffff;
-}
-
-/* File Upload */
-input[type="file"] {
-    background: #222;
-    color: #ddd;
-    padding: 10px;
-    border: 1px solid #444;
-    border-radius: 5px;
-    display: block;
-    margin: 10px auto;
-}
-
-/* Buttons */
-button {
-    background: #0a0a0a;
-    color: white;
-    border: none;
-    padding: 10px 20px;
+    text-align: center;
     cursor: pointer;
+    transition: border-color 0.3s ease;
+    width: 22%;
+    position: relative;
+    top: 5rem;
+    left: 5rem;
+}
+
+
+.btn1 {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
     border-radius: 5px;
-    font-size: 16px;
-    transition: 0.3s;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+    top: 5rem;
+    left: 11.5rem;
+    margin-top: 1rem;
+    width: 8%;
 }
 
-button:hover {
-    background: #121212;
+
+.search-form {
+    position: relative;
+    top: 6rem;
+    left: 6rem;
+    width: 18%;
 }
 
-.document-list {
-    display: flex;
-    gap: 20px;
-    top: -20rem;
-}
-
-/* Document Items */
-.document-item {
-    width: 40%;
-    background: #222;
-    margin: 10px 0;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
-}
-
-/* Document Preview */
-.document-preview {
-    width: 90%;
-    height: 200px;
+.search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    margin-top: 10px;
-    background: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.btn2 {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+    left: 6.5rem;
+    margin-top: 0.5rem;
+}
+
+.sort-options {
+    position: relative;
+    top: -7.5rem;
+    left: 40rem;
+    width: 18%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 10px;
+    border: 2px solid #6c6c6c;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #6c6c6c60;
 }
 
-.document-preview img, .document-preview embed, .document-preview iframe {
+
+
+
+.container {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    left: 12rem;
+}
+.table {
+    margin-top: 20px;
+}
+
+
+
+.document-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s ease-in-out;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    width: 20rem;
+    height: 22rem;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.document-card:hover {
+    transform: scale(1.05);
+}
+
+.iframe-container {
+    position: relative;
+    width: 100%;
+    height: 80%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+iframe {
     width: 100%;
     height: 100%;
-    border-radius: 5px;
+    border: none;
+    display: none;
 }
 
-/* Action Buttons */
-.actions {
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.document-options {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px;
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 10px;
+    visibility: hidden;
+    color: black;
 }
-
-.actions a, .actions button {
-    padding: 10px;
-    border-radius: 5px;
-    color: white;
-    text-decoration: none;
-    transition: 0.3s;
-    font-size: 18px;
-}
-
-/* View, Download, Delete, Rename */
-.view { background: #03dac6; }
-.view:hover { background: #018786; }
-
-.download { background: #2196f3; }
-.download:hover { background: #1565c0; }
-
-.delete-btn { background: #d32f2f; border: none; }
-.delete-btn:hover { background: #b71c1c; }
-
-.rename-btn { background: #ff9800; border: none; }
-.rename-btn:hover { background: #e65100; }
-
-/* Rename Form */
-.rename-form {
+.card-title {
+    position: absolute;
+    top: 2.9rem;
+    left: 0;
+    padding: 5px;
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 10px;
+    color: black;
+}
+.document-card:hover .document-options {
+    visibility: visible;
 }
 
-.rename-form input {
-    padding: 5px;
-    border-radius: 5px;
+.icon-btn {
+    background: none;
     border: none;
-    outline: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-/* Mobile Responsive */
-@media (max-width: 600px) {
-    .container {
-        max-width: 90%;
-        padding: 15px;
-    }
+.icon-btn:hover {
+    color: #4CAF50;
 }
+
+
+.full-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.full-view iframe {
+    width: 80%;
+    height: 80%;
+    border-radius: 8px;
+}
+    .close-btn {
+        position: relative;
+        bottom: 16rem;
+        left: 40rem;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 3rem;
+        cursor: pointer;
+    }
+    .hidden {
+        display: none;
+    }

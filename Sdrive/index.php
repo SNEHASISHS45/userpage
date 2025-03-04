@@ -107,10 +107,13 @@ ob_end_flush();
         </nav>
     </header>
 
-
+    <div class='main1'>
+  <h2 class="first">SNEHASISH</h2>
+  <h2 class="second">SNEHASISH</h2>
+</div>
     
 
-        <div class="main">
+    <div class="main">
         <div class="secphotos section" id="secphotos">
             <?php
             include 'photos.php';
@@ -131,17 +134,14 @@ ob_end_flush();
 
         <div class="secvaults section" id="secvaults">
             <?php
-            include 'vaults.php';
+            include 'notes.php';
             ?>
         </div>
         </div>
 
- 
- <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.69/build/spline-viewer.js"></script>
- <spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
-
-
-
+        
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.72/build/spline-viewer.js"></script>
+        <spline-viewer url="https://prod.spline.design/Ylco7b1CsvLH5v89/scene.splinecode"></spline-viewer>
 
 
 <div class="floating-nav">

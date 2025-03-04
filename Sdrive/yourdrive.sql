@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 25, 2025 at 05:32 PM
+-- Generation Time: Mar 04, 2025 at 04:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -86,22 +86,23 @@ INSERT INTO `contacts` (`id`, `user_id`, `name`, `phone`, `group_name`, `created
 DROP TABLE IF EXISTS `documents`;
 CREATE TABLE IF NOT EXISTS `documents` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `filename` varchar(255) NOT NULL,
-  `filepath` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `url` text NOT NULL,
   `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `version` int(11) DEFAULT 1,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `documents`
 --
 
-INSERT INTO `documents` (`id`, `user_id`, `filename`, `filepath`, `uploaded_at`) VALUES
-(5, 13, 'বৈকুন্ঠের খাতা 2.pdf', 'uploads/user_13/1740126977_বৈকুন্ঠের খাতা 2.pdf', '2025-02-21 08:36:17'),
-(6, 13, 'বৈকুন্ঠের খাত3.docx', 'uploads/user_13/1740126987_বৈকুন্ঠের খাত3.docx', '2025-02-21 08:36:27'),
-(7, 13, 'download.pdf', 'uploads/user_13/1740126996_download.pdf', '2025-02-21 08:36:36');
+INSERT INTO `documents` (`id`, `title`, `url`, `uploaded_at`, `version`) VALUES
+(1, 's', 'https://res.cloudinary.com/dzn369qpk/raw/upload/v1740985448/t4yh26p0jmcn4hx3rkmw.tmp', '2025-03-03 07:25:48', 1),
+(2, 's', 'https://res.cloudinary.com/dzn369qpk/raw/upload/v1740985716/mpz7qxdz2v9c4ta1dvrv.tmp', '2025-03-03 07:25:48', 1),
+(3, 's', 'https://res.cloudinary.com/dzn369qpk/raw/upload/v1740985727/i1afk3qaiba7axc2ess1.tmp', '2025-03-03 07:25:48', 1),
+(4, 'ss', 'https://res.cloudinary.com/dzn369qpk/raw/upload/v1740985830/lltzepnygmvwxhprynjd.tmp', '2025-03-03 07:25:48', 1),
+(5, 'Online Booking Receipt', 'https://res.cloudinary.com/dzn369qpk/raw/upload/v1740985951/pfj3cnxdtghb8kbxpupj.tmp', '2025-03-03 07:25:48', 1);
 
 -- --------------------------------------------------------
 
@@ -137,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `photos` (
   `title` varchar(255) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `photos`
@@ -189,14 +190,20 @@ INSERT INTO `photos` (`id`, `filename`, `filepath`, `uploaded_at`, `description`
 (87, 'rgb(56, 1, 57) (1).png', '', '2025-02-23 11:53:31', NULL, NULL, NULL, 15),
 (90, 'wallpaperflare.com_wallpaper.jpg', '', '2025-02-23 11:53:31', NULL, NULL, NULL, 15),
 (91, 'WhatsApp Image 2024-06-02 at 14.05.43_38762eab.jpg', '', '2025-02-23 11:53:31', NULL, NULL, NULL, 15),
-(99, '2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', 'uploads/11/1740422601_2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(100, '7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', 'uploads/11/1740422601_7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(101, '843b54d6-ac45-480d-9c95-6edbdec8c329.png', 'uploads/11/1740422601_843b54d6-ac45-480d-9c95-6edbdec8c329.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(102, '11001e19-5761-4d48-821b-9eda36382a55.png', 'uploads/11/1740422601_11001e19-5761-4d48-821b-9eda36382a55.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(103, 'a43d1104-e99c-4944-a7d5-476b96c25161.png', 'uploads/11/1740422601_a43d1104-e99c-4944-a7d5-476b96c25161.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(104, 'c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', 'uploads/11/1740422601_c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', '2025-02-24 18:43:21', NULL, NULL, NULL, 11),
-(105, '1000007225-01.jpeg', 'uploads/11/1740422616_1000007225-01.jpeg', '2025-02-24 18:43:36', NULL, NULL, NULL, 11),
-(106, '20240103_120659.JPG', 'uploads/11/1740422625_20240103_120659.JPG', '2025-02-24 18:43:45', NULL, NULL, NULL, 11);
+(108, '2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565301/sdrive_backup/11/2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', '2025-02-26 10:21:38', NULL, NULL, NULL, 11),
+(109, '7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565306/sdrive_backup/11/7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', '2025-02-26 10:21:42', NULL, NULL, NULL, 11),
+(110, '843b54d6-ac45-480d-9c95-6edbdec8c329.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565310/sdrive_backup/11/843b54d6-ac45-480d-9c95-6edbdec8c329.png', '2025-02-26 10:21:46', NULL, NULL, 'Snehasish', 11),
+(111, '11001e19-5761-4d48-821b-9eda36382a55.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565315/sdrive_backup/11/11001e19-5761-4d48-821b-9eda36382a55.png', '2025-02-26 10:21:51', NULL, NULL, NULL, 11),
+(112, 'a43d1104-e99c-4944-a7d5-476b96c25161.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565319/sdrive_backup/11/a43d1104-e99c-4944-a7d5-476b96c25161.png', '2025-02-26 10:21:55', NULL, NULL, 'Bubu', 11),
+(113, 'c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565324/sdrive_backup/11/c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', '2025-02-26 10:22:00', NULL, NULL, NULL, 11),
+(114, '1000007225-01.jpeg', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740565352/sdrive_backup/11/1000007225-01.jpg', '2025-02-26 10:22:28', NULL, NULL, NULL, 11),
+(115, '2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680307/sdrive_backup/13/2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', '2025-02-27 18:18:21', NULL, NULL, NULL, 13),
+(116, '7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680311/sdrive_backup/13/7c2a0207-ca67-4a1d-a755-abd3f7ab7d7b.png', '2025-02-27 18:18:26', NULL, NULL, NULL, 13),
+(117, '843b54d6-ac45-480d-9c95-6edbdec8c329.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680317/sdrive_backup/13/843b54d6-ac45-480d-9c95-6edbdec8c329.png', '2025-02-27 18:18:31', NULL, NULL, NULL, 13),
+(118, '11001e19-5761-4d48-821b-9eda36382a55.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680321/sdrive_backup/13/11001e19-5761-4d48-821b-9eda36382a55.png', '2025-02-27 18:18:36', NULL, NULL, NULL, 13),
+(119, 'a43d1104-e99c-4944-a7d5-476b96c25161.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680326/sdrive_backup/13/a43d1104-e99c-4944-a7d5-476b96c25161.png', '2025-02-27 18:18:40', NULL, NULL, NULL, 13),
+(120, 'c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680330/sdrive_backup/13/c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', '2025-02-27 18:18:45', NULL, NULL, NULL, 13),
+(121, '1000007225-01.jpeg', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740680733/sdrive_backup/13/1000007225-01.jpg', '2025-02-27 18:25:27', NULL, NULL, NULL, 13);
 
 -- --------------------------------------------------------
 
@@ -227,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `username`, `password`, `profile_pic`, `created_at`, `phone`, `profile_picture`, `login_token`, `remember_token`, `pin_hash`) VALUES
-(11, 'snehasishsarkar439@gmail.com', 'Snehasish', '$2y$10$dDD3Ko4Uv4Cqtfw5eUeLLePSJhkR6/osAR1.Thhww7lYdHV5ZBOia', '2a0842f7-1a52-4e3c-8b0f-c4be0cef713c.png', '2025-02-17 14:29:34', '7044122730', NULL, '6c284e12137ce16b5f7bcd8100b6d316', NULL, '$2y$10$JC8hSyl9Uf.ogUMmpJ2O7un4BfH8.blDd9MR.E8egZ.PSrT4hBuQi'),
+(11, 'snehasishsarkar439@gmail.com', 'Snehasish', '$2y$10$z8a9G4rys/.OI0xz8MXKD.NgWf.fKmSASu8PlSX7Levw.gTiFcwmm', 'https://res.cloudinary.com/dzn369qpk/image/upload/v1740562920/sdrive_backup/profile_pics/seyzjqgxtnhxjgwgnpgg.png', '2025-02-17 14:29:34', '7044122730', NULL, 'cddaad3890985816d5103f1a92981b8f', NULL, '$2y$10$JC8hSyl9Uf.ogUMmpJ2O7un4BfH8.blDd9MR.E8egZ.PSrT4hBuQi'),
 (12, 'snehasishsarkar43@gmail.com', 'bubu', '$2y$10$nb7XgnKMD3NA.6GxHy1/J.1hY6cG0z6Nt0xEYmIH2Hl7wl3vmD7mG', '1702392863857.jpg', '2025-02-20 14:03:40', '1234567890', NULL, NULL, NULL, NULL),
 (13, 'bubu45@gmail.com', 'BUBU1', '$2y$10$aFfmgaIpqGy7zyp83GoTleyx07aeuFw8tbP1DuXCp44.95Cdo2AgS', '1000007225-01.jpeg', '2025-02-20 16:33:44', '', NULL, '21477691ca45b696ef19453e526b4b88', NULL, NULL),
 (14, 'bubu445@gmail.com', 'BUBU2', '$2y$10$k6PBP4uNWzJOPyc67MPYBuGIsSeDnwy.Vnb/Gd3WkMTqyAKladBNe', 'c1b21a88-e78d-4785-9226-cf8f7e8f9fd7.png', '2025-02-20 16:54:14', '', NULL, NULL, NULL, NULL),
@@ -245,16 +252,10 @@ CREATE TABLE IF NOT EXISTS `vault_items` (
   `user_id` int(11) NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `file_path` varchar(500) NOT NULL,
+  `cloud_url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `vault_items`
---
-
-INSERT INTO `vault_items` (`id`, `user_id`, `file_name`, `file_path`) VALUES
-(6, 11, 'Snehasish sarkar cv.pdf', 'uploads/11_Snehasish sarkar cv.pdf');
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Constraints for dumped tables
@@ -271,12 +272,6 @@ ALTER TABLE `activity_log`
 --
 ALTER TABLE `contacts`
   ADD CONSTRAINT `contacts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `documents`
---
-ALTER TABLE `documents`
-  ADD CONSTRAINT `documents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `items`

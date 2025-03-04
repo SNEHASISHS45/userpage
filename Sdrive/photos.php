@@ -87,7 +87,7 @@ if (isset($_POST['delete_id'])) {
         $stmt->close();
     }
 
-    echo "Deleted successfully!";
+    
     exit();
 }
 
@@ -101,7 +101,7 @@ if (isset($_POST['update_title'])) {
     $stmt->execute();
     $stmt->close();
 
-    echo "Title updated successfully!";
+    
     exit();
 }
 
@@ -125,6 +125,8 @@ ob_end_flush();
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Rounded" rel="stylesheet">
     <link rel="stylesheet" href="css/photos/photos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
  
 </head>
@@ -158,8 +160,8 @@ ob_end_flush();
                         </div>
                         <div class="info">
                             <span class="title"><?= htmlspecialchars($row['title'] ?? $row['filename']) ?></span>
-                            <button class="edit-title" data-id="<?= $row['id'] ?>">Edit Title</button>
-                            <button class="delete" data-id="<?= $row['id'] ?>">Delete</button>
+                            <button class="edit-title" data-id="<?= $row['id'] ?>" style="background-color: #0d0d0d;"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="delete" data-id="<?= $row['id'] ?>" style="background-color: #0d0d0d;"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -175,9 +177,7 @@ ob_end_flush();
         <div class="viewer">
             <div>
                 <div class="alt">Image Preview</div>
-                <button class="close">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+                    <span class="material-symbols-rounded close"><i class="fa-solid fa-xmark"></i></span>
             </div>
             <div>
                 <img src="" alt="Preview">
@@ -252,6 +252,7 @@ ob_end_flush();
                 }
             };
         });
+
     </script>
 
     <?php

@@ -1,158 +1,151 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Database connection
+include 'config.php';
+include 'cloudinary_config.php';
 
-require 'config.php';
 require 'vendor/autoload.php';
 
 use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 
-// Initialize Cloudinary
-$cloudinary = new Cloudinary([
-    'cloud' => [
-        'cloud_name' => 'dzn369qpk',
-        'api_key'    => '274266766631951',
-        'api_secret' => 'ThwRkNdXKQ2LKnQAAukKgmo510g',
-    ],
-    'url' => [
-        'secure' => true // Ensure HTTPS URLs
-    ]
-]);
 
-if (!isset($_SESSION["user_id"])) {
-    header("Location: login.php");
-    exit();
-}
 
-$user_id = $_SESSION['user_id'];
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    if (isset($_FILES["document"])) {
-        $file = $_FILES["document"];
-
-        try {
-            $upload = $cloudinary->uploadApi()->upload($file['tmp_name'], [
-                'folder' => 'sdrive_backup/user_' . $user_id . '/documents',
-                'resource_type' => 'auto',
-                'public_id' => pathinfo($file['name'], PATHINFO_FILENAME)
-            ]);
-
-            $filename = $upload['original_filename'] . '.' . $upload['format'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['documents'])) {
+    foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
+        $file_name = pathinfo($_FILES['documents']['name'][$key], PATHINFO_FILENAME); // Auto-detect title
+        
+        // Check for duplicate uploads
+        $check_sql = "SELECT * FROM documents WHERE title = '$file_name'";
+        $check_result = $conn->query($check_sql);
+        
+        if ($check_result->num_rows == 0) {
+            $upload = $uploadApi->upload($tmp_name, ['resource_type' => 'raw']);
             $file_url = $upload['secure_url'];
-
-            $stmt = $conn->prepare("INSERT INTO documents (user_id, filename, filepath) VALUES (?, ?, ?)");
-            $stmt->bind_param("iss", $user_id, $filename, $file_url);
-            $stmt->execute();
-            $stmt->close();
-
-        } catch (Exception $e) {
-            die("Upload Error: " . $e->getMessage());
+            
+            $sql = "INSERT INTO documents (title, url, tags, uploaded_at, version) VALUES ('$file_name', '$file_url', '', NOW(), 1)";
+            $conn->query($sql);
         }
     }
-
-    if (isset($_POST['delete_id'])) {
-        $delete_id = $_POST['delete_id'];
-
-        $stmt = $conn->prepare("SELECT filepath FROM documents WHERE id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $delete_id, $user_id);
-        $stmt->execute();
-        $stmt->bind_result($file_url);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($file_url) {
-            preg_match("/\/([^\/]+)\.(\w+)$/", $file_url, $matches);
-            $public_id = 'sdrive_backup/user_' . $user_id . '/documents/' . $matches[1];
-
-            try {
-                $cloudinary->uploadApi()->destroy($public_id, ['resource_type' => 'auto']);
-
-                $stmt = $conn->prepare("DELETE FROM documents WHERE id = ? AND user_id = ?");
-                $stmt->bind_param("ii", $delete_id, $user_id);
-                $stmt->execute();
-                $stmt->close();
-
-            } catch (Exception $e) {
-                die("Delete Error: " . $e->getMessage());
-            }
-        }
-    }
-
-    if (isset($_POST['rename_id']) && isset($_POST['new_name'])) {
-        $rename_id = $_POST['rename_id'];
-        $new_name = basename($_POST['new_name']);
-
-        $stmt = $conn->prepare("SELECT filepath FROM documents WHERE id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $rename_id, $user_id);
-        $stmt->execute();
-        $stmt->bind_result($file_url);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($file_url) {
-            preg_match("/\/([^\/]+)\.(\w+)$/", $file_url, $matches);
-            $old_public_id = 'sdrive_backup/user_' . $user_id . '/documents/' . $matches[1];
-            $new_public_id = 'sdrive_backup/user_' . $user_id . '/documents/' . pathinfo($new_name, PATHINFO_FILENAME);
-
-            try {
-                $upload = $cloudinary->uploadApi()->rename($old_public_id, $new_public_id, ['resource_type' => 'auto']);
-                $new_url = $upload['secure_url'];
-
-                $stmt = $conn->prepare("UPDATE documents SET filename = ?, filepath = ? WHERE id = ? AND user_id = ?");
-                $stmt->bind_param("ssii", $new_name, $new_url, $rename_id, $user_id);
-                $stmt->execute();
-                $stmt->close();
-
-            } catch (Exception $e) {
-                die("Rename Error: " . $e->getMessage());
-            }
-        }
-    }
-
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = ? ORDER BY id DESC");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+if (isset($_POST['edit_title'])) {
+    $id = $_POST['id'];
+    $new_title = $conn->real_escape_string($_POST['new_title']);
+    $sql = "UPDATE documents SET title='$new_title' WHERE id=$id";
+    $conn->query($sql);
+}
+
+if (isset($_POST['delete'])) {
+    $id = $_POST['id'];
+    $sql = "DELETE FROM documents WHERE id=$id";
+    $conn->query($sql);
+}
+
+$search_query = "";
+$filter_query = "";
+if (isset($_GET['search'])) {
+    $search_query = $conn->real_escape_string($_GET['search']);
+    $filter_query = "WHERE title LIKE '%$search_query%'";
+}
+
+$sort_query = "ORDER BY uploaded_at DESC";
+if (isset($_GET['sort'])) {
+    if ($_GET['sort'] === 'name') {
+        $sort_query = "ORDER BY title ASC";
+    } elseif ($_GET['sort'] === 'date') {
+        $sort_query = "ORDER BY uploaded_at DESC";
+    }
+}
+
+$documents = $conn->query("SELECT * FROM documents $filter_query $sort_query");
 ?>
 
+
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Document Backup</title>
+    <title>Document Manager</title>
     <link rel="stylesheet" href="css/documents/documents.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <h3>Upload a Document</h3>
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="document" required>
-        <button type="submit">Upload</button>
-    </form>
+        <div class="upload-area" id="upload-area">Drag & Drop Files Here</div>
+        <form method="POST" enctype="multipart/form-data" id="upload-form">
+            <input type="file" name="documents[]" id="file-input" multiple required hidden>
+            <button class="btn1" type="submit">Upload</button>
+        </form>
+        <progress id="progress-bar" value="0" max="100" style="width: 100%; display: none;"></progress>
 
-    <h3>Your Documents</h3>
-    <?php while ($doc = $result->fetch_assoc()): ?>
-        <div>
-            <p><?php echo htmlspecialchars($doc['filename']); ?></p>
-            <a href="<?php echo htmlspecialchars($doc['filepath']); ?>" target="_blank">View</a>
-            <a href="<?php echo htmlspecialchars($doc['filepath']); ?>" download>Download</a>
-
-            <form method="post">
-                <input type="hidden" name="delete_id" value="<?php echo $doc['id']; ?>">
-                <button type="submit">Delete</button>
-            </form>
-
-            <form method="post">
-                <input type="hidden" name="rename_id" value="<?php echo $doc['id']; ?>">
-                <input type="text" name="new_name" placeholder="New name" required>
-                <button type="submit">Rename</button>
-            </form>
+        <form method="GET" class="search-form">
+            <input class="search-input" type="text" name="search" placeholder="Search by title" value="<?= htmlspecialchars($search_query) ?>">
+            <button class="btn2" type="submit">Search</button>
+        </form>
+        <div class="sort-options">
+            <label>Sort by:</label>
+            <a href="?sort=name">Name</a> |
+            <a href="?sort=date">Date</a>
         </div>
-    <?php endwhile; ?>
+        <div class="container">
+        <div class="row">
+            <?php while ($row = $documents->fetch_assoc()): ?>
+                <div class="col-md-4">
+                    <div class="document-card" ondblclick="openFullView('<?= urlencode($row['url']) ?>')">
+                        <div class="iframe-container">
+                            <div class="loader"></div>
+                            <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=<?= urlencode($row['url']) ?>" onload="hideLoader(this)"></iframe>
+                        </div>
+                        <div class="document-options">
+                            <h5 class="card-title"><?= htmlspecialchars($row['title']) ?></h5>
+                            <form method="POST" class="mt-2">
+                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                <div class="input-group">
+                                    <input type="text" name="new_title" class="form-control" placeholder="New Title" required>
+                                    <button type="submit" name="edit_title" class="btn btn-edit"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </form>
+                            <form method="POST" class="mt-2">
+                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                <button type="submit" name="delete" onclick="return confirm('Are you sure you want to delete this document?')" class="btn btn-delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
+    </div>
+
+      <div id="full-view" class="full-view hidden" onclick="closeFullView(event)">
+        <button class="close-btn" onclick="closeFullView()"><i class="fas fa-times"></i></button>
+        <iframe id="full-view-frame" src="https://mozilla.github.io/pdf.js/web/viewer.html?file=<?= urlencode($row['url']) ?>" onload="hideLoader(this)"></iframe>
+    </div>
+
+<script>
+    function hideLoader(iframe) {
+        iframe.previousElementSibling.style.display = "none"; // Hide loader
+        iframe.style.display = "block"; // Show iframe
+    }
+
+    function openFullView(url) {
+    document.getElementById("full-view").classList.remove("hidden");
+    document.getElementById("full-view-frame").src = "https://mozilla.github.io/pdf.js/web/viewer.html?file=" + url;
+}
+
+function closeFullView() {
+    document.getElementById("full-view").classList.add("hidden");
+    document.getElementById("full-view-frame").src = "";
+}
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </body>
 </html>
