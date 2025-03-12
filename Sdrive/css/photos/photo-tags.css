@@ -1,0 +1,474 @@
+/* Tag styles */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.tag {
+    background-color: #e1f5fe;
+    color: #0277bd;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tag .remove-tag {
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.tag .remove-tag:hover {
+    opacity: 1;
+}
+
+.add-tag-btn {
+    background-color: transparent;
+    border: 1px dashed #ccc;
+    color: #666;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-tag-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #999;
+}
+
+/* Viewer tag styles */
+.viewer-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.viewer-tag {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+.add-viewer-tag {
+    background-color: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-viewer-tag:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+
+/* Photo Tags Feature Styles */
+.tags-container {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.tag {
+    background-color: #e9ecef;
+    border-radius: 15px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    color: #495057;
+    transition: all 0.2s ease;
+}
+
+.tag:hover {
+    background-color: #dee2e6;
+}
+
+.tag .remove-tag {
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+.tag .remove-tag:hover {
+    opacity: 1;
+}
+
+.add-tag-btn {
+    background-color: transparent;
+    border: 1px dashed #ced4da;
+    border-radius: 15px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-tag-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+/* Viewer tags section */
+.viewer-tags {
+    padding: 10px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+.viewer-tag {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    border-radius: 15px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+}
+
+.add-viewer-tag {
+    background-color: transparent;
+    border: 1px dashed rgba(255,255,255,0.5);
+    color: white;
+    border-radius: 15px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+
+/* Message Popup Styles */
+.message-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 300px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2000;
+    font-family: 'Reem Kufi', sans-serif;
+    animation: slideIn 0.3s ease forwards, fadeOut 0.5s ease 2.5s forwards;
+    display: flex;
+    align-items: center;
+}
+
+.message-popup.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.message-popup.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.message-popup.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+.message-popup-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.message-popup-content {
+    flex: 1;
+}
+
+.message-popup-close {
+    margin-left: 10px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.message-popup-close:hover {
+    opacity: 1;
+}
+
+/* Tag Input Modal Styles */
+.tag-input-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.tag-input-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tag-input-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: transform 0.3s;
+}
+
+.tag-input-modal.active .tag-input-container {
+    transform: translateY(0);
+}
+
+.tag-input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tag-input-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.tag-input-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #777;
+    transition: color 0.2s;
+}
+
+.tag-input-close:hover {
+    color: #333;
+}
+
+.tag-input-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.tag-input-form input {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    margin-bottom: 15px;
+    transition: border-color 0.2s;
+}
+
+.tag-input-form input:focus {
+    border-color: #4285f4;
+    outline: none;
+}
+
+.tag-input-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.tag-input-actions button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag-input-cancel {
+    background-color: #f1f3f4;
+    border: 1px solid #ddd;
+    color: #5f6368;
+}
+
+.tag-input-cancel:hover {
+    background-color: #e8eaed;
+}
+
+.tag-input-save {
+    background-color: #4285f4;
+    border: 1px solid #4285f4;
+    color: white;
+}
+
+.tag-input-save:hover {
+    background-color: #3367d6;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Add these styles to your existing photo-tags.css file */
+
+/* Filter container styles */
+.filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tag-filter label {
+    font-weight: 500;
+    color: #555;
+}
+
+.tag-filter select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-family: inherit;
+    min-width: 180px;
+}
+
+.clear-filter {
+    color: #dc3545;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.clear-filter:hover {
+    color: #bd2130;
+    text-decoration: underline;
+}
+
+/* Tag suggestions */
+.tag-suggestions {
+    position: absolute;
+    width: calc(100% - 24px);
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 10;
+    display: none;
+}
+
+.tag-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-suggestion-item:hover {
+    background-color: #f1f3f4;
+}
+
+/* Improved tag styles */
+.tag {
+    background-color: #e1f5fe;
+    color: #0277bd;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tag:hover {
+    background-color: #b3e5fc;
+}
+
+.tag .remove-tag {
+    margin-left: 6px;
+    font-weight: bold;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    font-size: 1.1rem;
+}
+
+.tag .remove-tag:hover {
+    opacity: 1;
+    color: #e53935;
+}
+
+/* Tag count badge */
+.tag-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0277bd;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    margin-left: 5px;
+}
+
+/* Viewer tag improvements */
+.viewer-tag {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+    backdrop-filter: blur(5px);
+}
+
+.viewer-tag:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="floating-nav">
+    <nav role="navigation" class="nav-menu w-nav-menu menu">
+        <button class="floating-nav__link w-nav-link menu__item active" aria-label="Photos" style="color: whitesmoke;" onclick="toggleDiv('secphotos')">Photos</button>
+        <button class="floating-nav__link w-nav-link menu__item" aria-label="Contacts" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('seccontacts')">Contacts</button>
+        <button class="floating-nav__link w-nav-link menu__item" aria-label="Documents" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secdocuments')">Documents</button>
+        <button class="floating-nav__link w-nav-link menu__item" aria-label="Notes" style="--bgColorItem: #f4f4f4;" onclick="toggleDiv('secvaults')">Notes</button>
+        <div class="menu__border"></div>
+    </nav>
+    
+    <div class="svg-container">
+        <svg viewBox="0 0 202.9 45.5">
+            <clipPath id="menu" clipPathUnits="objectBoundingBox" transform="scale(0.0049285362247413 0.021978021978022)">
+                <path d="M6.7,45.5c5.7,0.1,14.1-0.4,23.3-4c5.7-2.3,9.9-5,18.1-10.5c10.7-7.1,11.8-9.2,20.6-14.3c5-2.9,9.2-5.2,15.2-7                     c7.1-2.1,13.3-2.3,17.6-2.1c4.2-0.2,10.5,0.1,17.6,2.1c6.1,1.8,10.2,4.1,15.2,7c8.8,5,9.9,7.1,20.6,14.3c8.3,5.5,12.4,8.2,18.1,10.5                     c9.2,3.6,17.6,4.2,23.3,4H6.7z" />
+            </clipPath>
+        </svg>
+    </div>
+</div>
+
+<style>
+/* Floating navigation */
+.floating-nav {
+  box-sizing: border-box;
+  --bgColorMenu: rgba(0, 0, 0, 0.8);
+  --duration: 0.7s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 100;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  filter: drop-shadow(0px 20px 10px rgba(0, 0, 0, 0.3));
+  transition: all 0.5s ease;
+}
+
+.menu {
+  color: var(--text-color);
+  border-radius: 20px;
+  display: flex;
+  width: 90%;
+  max-width: 450px;
+  height: 3.5rem;
+  padding: 0.5em;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bgColorMenu);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.5s ease;
+}
+
+.menu__item {
+  all: unset;
+  flex-grow: 1;
+  z-index: 100;
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  border-radius: 10px;
+  align-items: center;
+  will-change: transform;
+  justify-content: center;
+  padding: 0.5em;
+  transition: transform var(--timeOut, var(--duration));
+  font-size: 0.85rem;
+  min-width: 22px; /* Minimum touch target size */
+  min-height: 22px; /* Minimum touch target size */
+}
+
+/* Active state for the navbar */
+.floating-nav.active {
+  bottom: 40%;
+  left: 1.5rem;
+  right: auto;
+}
+
+.floating-nav.active .menu {
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  padding: 1em 0.5em;
+}
+
+.floating-nav.active .menu__item {
+  margin: 0.5em 0;
+}
+</style>
+
+<script>
+// Function to toggle the navigation position
+function toggleNavPosition() {
+  const nav = document.querySelector('.floating-nav');
+  nav.classList.toggle('active');
+}
+
+// Function to toggle div visibility (for your menu items)
+function toggleDiv(sectionId) {
+  // Your existing code for toggling div visibility
+  console.log('Toggle section:', sectionId);
+  
+  // Make the navbar active when a menu item is clicked
+  const nav = document.querySelector('.floating-nav');
+  if (!nav.classList.contains('active')) {
+    nav.classList.add('active');
+  }
+}
+
+// Add event listener to a button that will toggle the navigation position
+// This can be attached to a hamburger menu or any other UI element
+document.addEventListener('DOMContentLoaded', function() {
+  // Optional: Add a button to toggle the nav position
+  const toggleButton = document.createElement('button');
+  toggleButton.textContent = '≡';
+  toggleButton.style.position = 'fixed';
+  toggleButton.style.bottom = '5rem';
+  toggleButton.style.right = '1.5rem';
+  toggleButton.style.zIndex = '101';
+  toggleButton.style.padding = '0.5em';
+  toggleButton.style.borderRadius = '50%';
+  toggleButton.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+  toggleButton.style.color = 'white';
+  toggleButton.style.border = 'none';
+  toggleButton.style.cursor = 'pointer';
+  toggleButton.onclick = toggleNavPosition;
+  document.body.appendChild(toggleButton);
+});
+</script>
+</body>
+</html>

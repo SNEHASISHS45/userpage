@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input class="input" type="text" name="username" value="<?php echo htmlspecialchars($user_data['username']); ?>" placeholder="Username" required>
                         <input class="input" type="email" name="email" value="<?php echo htmlspecialchars($user_data['email']); ?>" placeholder="Email" required>
                         <input class="input" type="text" name="phone" value="<?php echo htmlspecialchars($user_data['phone']); ?>" placeholder="Phone" required>
-                        <input class="input" type="password" name="password" placeholder="New Password" required>
+                        <input class="input" type="password" name="password" placeholder="New Password">
                         <input class="fileup" type="file" name="profile_pic" accept="image/*">
                         <button type="submit">Update Profile</button>
                     </form>
