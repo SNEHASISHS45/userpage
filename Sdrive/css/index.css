@@ -103,8 +103,6 @@ body::-webkit-scrollbar {
 .header {
   color: var(--text-color);
   border-radius: 16px;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
   padding: 1rem 1.5rem;
   position: fixed;
   width: 95%;
@@ -113,24 +111,41 @@ body::-webkit-scrollbar {
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all var(--transition-speed) ease;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-.header:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(0, 0, 0, 0.6);
-}
 
+
+/* Logo container styles */
 .logo_container {
   padding-left: 0.5rem;
   display: flex;
   align-items: center;
+}
+
+/* Logo Image Styles */
+.logo-image {
+  height: 40px; /* Fixed height for consistency */
+  width: auto; /* Maintain aspect ratio */
+  object-fit: contain; /* Ensure the image fits within the container */
+  transition: transform 0.3s ease; /* Smooth hover effect */
+  cursor: pointer; /* Make it clickable */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); /* Add subtle shadow */
+}
+
+.logo-image:hover {
+  transform: scale(1.05); /* Slight grow effect on hover */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)) brightness(1.1); /* Enhanced shadow and brightness on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-image {
+    height: 32px; /* Slightly smaller on mobile */
+  }
 }
 
 .logo {
@@ -863,4 +878,25 @@ spline-viewer {
 
 .floating-nav.active .menu__item:nth-child(4) {
   --i: 4;
+}
+/* User info minimized state for scrolling */
+.user-info.minimized {
+  transform: scale(0.85);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.user-info.minimized .username {
+  display: none;
+}
+
+.user-info.minimized:hover {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Header scroll state */
+.header.scrolled {
+  height: calc(var(--header-height) - 1rem);
+  padding: 0.5rem 1.5rem;
 }

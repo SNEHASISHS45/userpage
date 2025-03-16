@@ -79,9 +79,11 @@ ob_end_flush();
 
 <body>
     <header class="header">
-        <div class="logo_container">
-            <a href="index.php" class="logo">SNEHASISH</a>
-        </div>
+    <div class="logo_container">
+  <a href="index.php">
+    <img src="css/images/logo.png" alt="Sdrive Logo" class="logo-image">
+  </a>
+</div>
         <nav class="nav-container" id="nav-container">
             <ul class="nav-links" id="nav-links">
                 <li><a href="index.php" class="active"><i class="fas fa-home"></i> HOME</a></li>
@@ -209,6 +211,20 @@ ob_end_flush();
         });
 
         document.addEventListener("DOMContentLoaded", function() {
+            // Add scroll event listener to minimize user info
+            window.addEventListener('scroll', function() {
+                const userInfo = document.querySelector('.user-info');
+                const header = document.querySelector('.header');
+                
+                if (window.scrollY > 50) {
+                    userInfo.classList.add('minimized');
+                    header.classList.add('scrolled');
+                } else {
+                    userInfo.classList.remove('minimized');
+                    header.classList.remove('scrolled');
+                }
+            });
+            
             // Saved profiles dropdown
             let profiles = JSON.parse(localStorage.getItem("saved_profiles")) || [];
             let dropdown = document.getElementById("saved-accounts");
