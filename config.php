@@ -1,14 +1,5 @@
 <?php
 
-// Load environment variables using Dotenv
-use Dotenv\Dotenv;
-
-try {
-    $dotenv = Dotenv::createImmutable(__DIR__);
-    $dotenv->load();
-} catch (Exception $e) {
-    die("Error: Failed to load .env file. " . $e->getMessage());
-}
 
 // Fetch environment variables
 $host = getenv('DB_HOST');
