@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config.php'; // Include database connection
+require '.env'; // Load environment variables
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     $action = $_POST["action"];
