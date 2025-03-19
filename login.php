@@ -10,46 +10,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     exit();
 
     // Handle Registration
-    if ($action == "register") {
-        $username = trim($_POST["username"] ?? '');
-        $email = trim($_POST["email"] ?? '');
-        $password = trim($_POST["password"] ?? '');
+    // Handle Registration
+if ($action == "register") {
+    $email = trim($_POST["email"] ?? '');
+    $password = trim($_POST["password"] ?? '');
 
-        // Check if all fields are filled
-        if ($username === '' || $email === '' || $password === '') {
-            echo "All fields are required.";
-            exit();
-        }
-
-        // Password validation
-        if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
-            echo "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.";
-            exit();
-        }
-
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-
-        // Check if the username already exists
-        $query = "SELECT id FROM users WHERE username = $1";
-        $result = pg_query_params($conn, $query, [$username]);
-
-        if (pg_num_rows($result) > 0) {
-            echo "Username already taken.";
-            exit();
-        }
-
-        // Insert new user
-        $query = "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)";
-        $result = pg_query_params($conn, $query, [$username, $email, $hashed_password]);
-
-        if ($result) {
-            echo "Registration successful!";
-            header("Location: dashboard.php");
-            exit();
-        } else {
-            echo "Error: Could not register.";
-        }
+    // Check if all fields are filled
+    if ($email === '' || $password === '') {
+        echo "Email and Password are required.";
+        exit();
     }
+
+    // Password validation
+    if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+        echo "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.";
+        exit();
+    }
+
+    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+    // Check if the email already exists
+    $query = "SELECT id FROM users WHERE email = $1";
+    $result = pg_query_params($conn, $query, [$email]);
+
+    if (pg_num_rows($result) > 0) {
+        echo "Email is already registered.";
+        exit();
+    }
+
+    // Insert new user (without username)
+    $query = "INSERT INTO users (email, password) VALUES ($1, $2)";
+    $result = pg_query_params($conn, $query, [$email, $hashed_password]);
+
+    if ($result) {
+        echo "Registration successful!";
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        echo "Error: Could not register.";
+    }
+}
+
 
     // Handle Login with Username
     if ($action == "login") {
@@ -154,11 +155,11 @@ if (isset($_COOKIE["login_token"])) {
                     <div class="flip-card-back">
                         <div class="title">Sign up</div>
                         <form action="login.php" method="POST">
-                            <input name="username" placeholder="Username" type="text">
-                            <input name="email" placeholder="Email" type="email">
-                            <input name="password" placeholder="Password" type="password">
-                            <button type="submit" name="action" value="register">Register</button>
-                        </form>
+    <input name="email" placeholder="Email" type="email" required>
+    <input name="password" placeholder="Password" type="password" required>
+    <button type="submit" name="action" value="register">Register</button>
+</form>
+
                     </div>
                 </div>
             </div>
