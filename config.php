@@ -1,17 +1,11 @@
 <?php
 
-
-// Fetch environment variables
-$host = getenv('DB_HOST');
-$port = getenv('DB_PORT');
-$dbname = getenv('DB_NAME');
-$user = getenv('DB_USER');
-$password = getenv('DB_PASSWORD');
-
-// Check if environment variables are set
-if (!$host || !$port || !$dbname || !$user || !$password) {
-    die("Error: Missing environment variables for database connection.");
-}
+// Database configuration
+$host = 'dpg-cvde525svqrc73efsaeg-a.oregon-postgres.render.com';      // Your database host
+$port = '5432';           // PostgreSQL default port
+$dbname = 'sdrive';     // Your database name
+$user = 'sdrive_user';       // Your database username
+$password = 'VmuIcCKW8MUIUrYz8GFxIdLzTMKlbuRh';   // Your database password
 
 // Establish PostgreSQL connection
 $conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
