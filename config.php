@@ -1,9 +1,4 @@
 <?php
-require 'vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
 $host = getenv('DB_HOST');
 $port = getenv('DB_PORT');
 $dbname = getenv('DB_NAME');
