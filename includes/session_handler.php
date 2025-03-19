@@ -2,7 +2,7 @@
 ob_start();
 session_start();
 
-require dirname(__DIR__) . '/config.php'; // Use dirname(__DIR__) to get parent directory path
+require dirname(__DIR__) . 'config.php'; // Use dirname(__DIR__) to get parent directory path
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
