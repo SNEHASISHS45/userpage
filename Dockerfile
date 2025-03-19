@@ -18,3 +18,12 @@ EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
+
+
+# Install PostgreSQL and necessary extensions
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo pdo_pgsql pgsql
+
+
+    
