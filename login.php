@@ -7,9 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
 
     // Handle Registration
     if ($action == "register") {
-        $username = trim($_POST["username"]);
-        $email = trim($_POST["email"]);
-        $password = trim($_POST["password"]);
+        $username = trim($_POST["username"] ?? ''); // Default to an empty string if not set
+        $email = trim($_POST["email"] ?? '');      // Default to an empty string if not set
+        $password = trim($_POST["password"] ?? ''); // Default to an empty string if not set
 
         // Password validation
         if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
