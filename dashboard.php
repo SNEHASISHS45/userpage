@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config.php'; // Include database connection
+require '.env';
 require 'vendor/autoload.php'; // Ensure Cloudinary SDK is loaded
 
 use Cloudinary\Cloudinary;

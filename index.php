@@ -4,6 +4,7 @@
 ob_start();
 // Remove the session_start() call here since it's already in session_handler.php
 require 'config.php'; // Include database connection
+require '.env';
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
