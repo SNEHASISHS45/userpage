@@ -1,7 +1,6 @@
 <?php
 session_start();
 require 'config.php'; // Include database connection
-require '.env';
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

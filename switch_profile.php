@@ -1,7 +1,6 @@
 <?php
 session_start();
 require 'config.php';
-require '.env';
 
 if (isset($_GET['id'])) {
     $newUserId = intval($_GET['id']);
