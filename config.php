@@ -1,9 +1,9 @@
 <?php
-$host = getenv('DB_HOST');
-$port = getenv('DB_PORT');
-$dbname = getenv('DB_NAME');
-$user = getenv('DB_USER');
-$password = getenv('DB_PASS');
+$host = getenv('dpg-cvde525svqrc73efsaeg-a.oregon-postgres.render.com');
+$port = getenv('5432');
+$dbname = getenv('sdrive');
+$user = getenv('sdrive_user');
+$password = getenv('VmuIcCKW8MUIUrYz8GFxIdLzTMKlbuRh');
 
 $conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
 
