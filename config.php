@@ -1,6 +1,4 @@
 <?php
-// Load Composer autoload
-require 'vendor/autoload.php';
 
 // Load environment variables using Dotenv
 use Dotenv\Dotenv;
