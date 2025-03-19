@@ -5,6 +5,8 @@ var_dump(getenv('DB_NAME'));
 var_dump(getenv('DB_USER'));
 var_dump(getenv('DB_PASSWORD'));
 
+var_dump(getenv('DB_HOST'), getenv('DB_PORT'), getenv('DB_NAME'), getenv('DB_USER'), getenv('DB_PASSWORD'));
+
 
 $host = 'dpg-cvde525svqrc73efsaeg-a.oregon-postgres.render.com';
 $port = '5432';
