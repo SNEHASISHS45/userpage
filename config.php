@@ -5,6 +5,7 @@ $dbname = 'sdrive';
 $user = 'sdrive_user';
 $password = 'VmuIcCKW8MUIUrYz8GFxIdLzTMKlbuRh';
 
+// Connect to PostgreSQL
 $conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
 
 if (!$conn) {
