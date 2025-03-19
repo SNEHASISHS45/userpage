@@ -1,6 +1,6 @@
 <?php
 require 'config.php';
-require 'config.php'
+require '.env';
 require __DIR__ . '/vendor/autoload.php';
 
 use Cloudinary\Configuration\Configuration;
