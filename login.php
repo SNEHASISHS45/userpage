@@ -83,14 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
             pg_query_params($conn, $query, [$token, $user['id']]);
 
             echo "<script>
-                if (confirm('Do you want to save this login for quick switching?')) {
-                    let profiles = JSON.parse(localStorage.getItem('saved_profiles')) || [];
-                    let exists = profiles.some(p => p.id === {$user['id']});
-                    if (!exists) {
-                        profiles.push({id: {$user['id']}, username: '{$user['username']}', profile_picture: '{$user['profile_picture']}'});
-                        localStorage.setItem('saved_profiles', JSON.stringify(profiles));
-                    }
-                }
                 window.location.href = 'index.php';
             </script>";
             exit();
@@ -148,21 +140,8 @@ if (isset($_COOKIE["login_token"])) {
                         <div class="title">Log in</div>
                         <form class="flip-card__form" action="login.php" method="POST">
                             <input class="flip-card__input" name="username" placeholder="Username" type="text">
-                            <div class="password-container">
-                                <div class="container flip-card__input" id="loginPassword">
-                                    <img src="https://dl.dropbox.com/s/jxp9lsqokpw0k6p/lock-icon-01.svg?raw=1" id="lock">
-                                    <input type="password" placeholder="Password" id="password">
-                                    <div id="eye-wrapper" onclick="toggle()">
-                                        <img src="https://dl.dropbox.com/s/g50832gcbpu0rh2/eye-open-01-01.svg?raw=1" id="open">
-                                        <img src="https://dl.dropbox.com/s/r8obue865fk7e2z/eye-close-01-01.svg?raw=1" id="close">
-                                    </div>
-                                </div>
-                            </div>
-                            <label class="remember">
-                                <input type="checkbox" name="remember" <?php echo isset($_COOKIE['remember_username']) ? 'checked' : ''; ?>> Remember Me
-                                <br>
-                                <button class="flip-card__btn" type="submit" name="action" value="login">Let’s go!</button>
-                            </label>
+                            <input class="flip-card__input" name="password" placeholder="Password" type="password">
+                            <button class="flip-card__btn" type="submit" name="action" value="login">Let’s go!</button>
                         </form>
                         <div class="forgot">
                             <button><a href="forgot.php">Forgot Username?</a></button>
@@ -171,8 +150,9 @@ if (isset($_COOKIE["login_token"])) {
                     <div class="flip-card-back">
                         <div class="title">Sign up</div>
                         <form class="flip-card__form" action="login.php" method="POST">
+                            <input class="flip-card__input" name="username" placeholder="Username" type="text">
                             <input class="flip-card__input" name="email" placeholder="Email" type="email">
-                            <input class="flip-card__input" id="signupPassword" name="password" placeholder="Password" type="password">
+                            <input class="flip-card__input" name="password" placeholder="Password" type="password">
                             <button class="flip-card__btn" type="submit" name="action" value="register">Confirm!</button>
                         </form>
                     </div>
