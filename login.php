@@ -5,14 +5,18 @@ require 'config.php'; // Include database connection
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     $action = $_POST["action"];
 
+    // Debugging: Check the submitted data
+    var_dump($_POST);
+    exit();
+
     // Handle Registration
     if ($action == "register") {
-        $username = trim($_POST["username"] ?? ''); // Default to an empty string if not set
-        $email = trim($_POST["email"] ?? '');      // Default to an empty string if not set
-        $password = trim($_POST["password"] ?? ''); // Default to an empty string if not set
+        $username = trim($_POST["username"] ?? '');
+        $email = trim($_POST["email"] ?? '');
+        $password = trim($_POST["password"] ?? '');
 
         // Check if all fields are filled
-        if (empty($username) || empty($email) || empty($password)) {
+        if ($username === '' || $email === '' || $password === '') {
             echo "All fields are required.";
             exit();
         }
@@ -149,11 +153,11 @@ if (isset($_COOKIE["login_token"])) {
                     </div>
                     <div class="flip-card-back">
                         <div class="title">Sign up</div>
-                        <form class="flip-card__form" action="login.php" method="POST">
-                            <input class="flip-card__input" name="username" placeholder="Username" type="text">
-                            <input class="flip-card__input" name="email" placeholder="Email" type="email">
-                            <input class="flip-card__input" name="password" placeholder="Password" type="password">
-                            <button class="flip-card__btn" type="submit" name="action" value="register">Confirm!</button>
+                        <form action="login.php" method="POST">
+                            <input name="username" placeholder="Username" type="text">
+                            <input name="email" placeholder="Email" type="email">
+                            <input name="password" placeholder="Password" type="password">
+                            <button type="submit" name="action" value="register">Register</button>
                         </form>
                     </div>
                 </div>
