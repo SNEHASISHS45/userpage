@@ -2,10 +2,6 @@
 session_start();
 require 'config.php'; // Include database connection
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     $action = $_POST["action"];
 
@@ -14,84 +10,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
         $username = trim($_POST["username"]);
         $email = trim($_POST["email"]);
         $password = trim($_POST["password"]);
-    
+
         // Password validation
         if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
             echo "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.";
             exit();
         }
-    
+
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-    
+
         // Check if the username already exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-    
-        if ($stmt->num_rows > 0) {
+        $query = "SELECT id FROM users WHERE username = $1";
+        $result = pg_query_params($conn, $query, [$username]);
+
+        if (pg_num_rows($result) > 0) {
             echo "Username already taken.";
             exit();
         }
-        $stmt->close();
-    
+
         // Insert new user
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $email, $hashed_password);
-    
-        if ($stmt->execute()) {
-            $_SESSION["user_id"] = $stmt->insert_id;
-            $_SESSION["username"] = $username;
+        $query = "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)";
+        $result = pg_query_params($conn, $query, [$username, $email, $hashed_password]);
+
+        if ($result) {
+            echo "Registration successful!";
             header("Location: dashboard.php");
             exit();
         } else {
             echo "Error: Could not register.";
         }
-        $stmt->close();
     }
-    
+
     // Handle Login with Username
     if ($action == "login") {
         $username = trim($_POST["username"] ?? '');
         $password = trim($_POST["password"] ?? '');
 
-        $stmt = $conn->prepare("SELECT id, username, password, profile_picture FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-        
-        // Check if username exists
-        if ($stmt->num_rows == 0) {
+        $query = "SELECT id, username, password, profile_picture FROM users WHERE username = $1";
+        $result = pg_query_params($conn, $query, [$username]);
+
+        if (pg_num_rows($result) == 0) {
             echo "Username not found.";
             exit();
         }
 
-        $stmt->bind_result($id, $username, $hashed_password, $profile_picture);
-        $stmt->fetch();
+        $user = pg_fetch_assoc($result);
 
         // Verify Password
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION["user_id"] = $id;
-            $_SESSION["username"] = $username;
-            $_SESSION["profile_picture"] = $profile_picture;
+        if (password_verify($password, $user['password'])) {
+            $_SESSION["user_id"] = $user['id'];
+            $_SESSION["username"] = $user['username'];
+            $_SESSION["profile_picture"] = $user['profile_picture'];
 
             // Set a cookie to remember the user
             $token = bin2hex(random_bytes(16));
             setcookie("login_token", $token, time() + (86400 * 30), "/"); // 30 days expiration
 
             // Store the token in the database
-            $stmt = $conn->prepare("UPDATE users SET login_token = ? WHERE id = ?");
-            $stmt->bind_param("si", $token, $id);
-            $stmt->execute();
-            $stmt->close();
+            $query = "UPDATE users SET login_token = $1 WHERE id = $2";
+            pg_query_params($conn, $query, [$token, $user['id']]);
 
-            // JavaScript prompt for profile saving
             echo "<script>
                 if (confirm('Do you want to save this login for quick switching?')) {
                     let profiles = JSON.parse(localStorage.getItem('saved_profiles')) || [];
-                    let exists = profiles.some(p => p.id === $id);
+                    let exists = profiles.some(p => p.id === {$user['id']});
                     if (!exists) {
-                        profiles.push({id: $id, username: '$username', profile_picture: '$profile_picture'});
+                        profiles.push({id: {$user['id']}, username: '{$user['username']}', profile_picture: '{$user['profile_picture']}'});
                         localStorage.setItem('saved_profiles', JSON.stringify(profiles));
                     }
                 }
@@ -101,7 +85,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
         } else {
             echo "Invalid username or password.";
         }
-        $stmt->close();
     }
 }
 
@@ -109,23 +92,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
 if (isset($_COOKIE["login_token"])) {
     $token = $_COOKIE["login_token"];
 
-    $stmt = $conn->prepare("SELECT id, username, profile_picture FROM users WHERE login_token = ?");
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $stmt->store_result();
+    $query = "SELECT id, username, profile_picture FROM users WHERE login_token = $1";
+    $result = pg_query_params($conn, $query, [$token]);
 
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $username, $profile_picture);
-        $stmt->fetch();
+    if (pg_num_rows($result) > 0) {
+        $user = pg_fetch_assoc($result);
 
-        $_SESSION["user_id"] = $id;
-        $_SESSION["username"] = $username;
-        $_SESSION["profile_picture"] = $profile_picture;
+        $_SESSION["user_id"] = $user['id'];
+        $_SESSION["username"] = $user['username'];
+        $_SESSION["profile_picture"] = $user['profile_picture'];
 
         header("Location: index.php");
         exit();
     }
-    $stmt->close();
 }
 ?>
 
