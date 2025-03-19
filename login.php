@@ -11,6 +11,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
         $email = trim($_POST["email"] ?? '');      // Default to an empty string if not set
         $password = trim($_POST["password"] ?? ''); // Default to an empty string if not set
 
+        // Check if all fields are filled
+        if (empty($username) || empty($email) || empty($password)) {
+            echo "All fields are required.";
+            exit();
+        }
+
         // Password validation
         if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
             echo "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.";
@@ -45,6 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["action"])) {
     if ($action == "login") {
         $username = trim($_POST["username"] ?? '');
         $password = trim($_POST["password"] ?? '');
+
+        // Check if all fields are filled
+        if (empty($username) || empty($password)) {
+            echo "Both username and password are required.";
+            exit();
+        }
 
         $query = "SELECT id, username, password, profile_picture FROM users WHERE username = $1";
         $result = pg_query_params($conn, $query, [$username]);
