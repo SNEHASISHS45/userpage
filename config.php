@@ -1,27 +1,32 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
 
-// Load .env file
+// Load .env variables
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$host = $_ENV['DB_HOST'] ?? null;
-$port = $_ENV['DB_PORT'] ?? null;
-$dbname = $_ENV['DB_NAME'] ?? null;
-$user = $_ENV['DB_USER'] ?? null;
-$password = $_ENV['DB_PASSWORD'] ?? null;
-
-if (!$host || !$port || !$dbname || !$user || !$password) {
-    die("Error: Missing environment variables for database connection.");
+// Validate environment variables
+$requiredVars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+foreach ($requiredVars as $var) {
+    if (empty($_ENV[$var])) {
+        die("Error: Missing environment variable: $var");
+    }
 }
 
-// Connect to PostgreSQL
-$conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+// Database connection
+function dbConnect() {
+    $host = $_ENV['DB_HOST'];
+    $port = $_ENV['DB_PORT'];
+    $dbname = $_ENV['DB_NAME'];
+    $user = $_ENV['DB_USER'];
+    $password = $_ENV['DB_PASSWORD'];
 
-if (!$conn) {
-    die("Connection failed: " . pg_last_error());
+    $conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+    if (!$conn) {
+        die("Error: Failed to connect to the database. " . pg_last_error());
+    }
+    return $conn;
 }
-
-echo "Connected successfully!";
 ?>
